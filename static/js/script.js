@@ -24,5 +24,19 @@ document.addEventListener('DOMContentLoaded', function() {
                 <p><strong>Рейтинг:</strong> ${stars}</p>
             `;
         }
+
+        cell.addEventListener('mouseenter', function() {
+        const controls = this.querySelector('.item-controls');
+        if (controls) {
+            controls.style.opacity = '1';
+        }
+        });
+    
+        cell.addEventListener('mouseleave', function() {
+        const controls = this.querySelector('.item-controls');
+        if (controls) {
+            controls.style.opacity = '0.7';
+        }
+        });
     });
 });

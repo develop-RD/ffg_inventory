@@ -12,13 +12,16 @@ app.config['UPLOAD_FOLDER'] = 'static/uploads'
 app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg', 'gif'}
 
 db = SQLAlchemy(app)
+# Создаем папку для загрузок, если ее нет
+if not os.path.exists(app.config['UPLOAD_FOLDER']):
+    os.makedirs(app.config['UPLOAD_FOLDER'])
 
 # Модель пользователя
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
     password = db.Column(db.String(120), nullable=False)
-    items = db.relationship('InventoryItem', backref='user', lazy=True)
+    items = db.relationship('InventoryItem', backref='user', lazy=True, cascade="all, delete-orphan")
 
 # Модель предмета инвентаря
 class InventoryItem(db.Model):
@@ -138,6 +141,74 @@ def upload(item_type):
 def logout():
     session.clear()
     return redirect(url_for('index'))
+
+
+@app.route('/delete/<item_type>', methods=['POST'])
+def delete_item(item_type):
+    if 'user_id' not in session:
+        return redirect(url_for('index'))
+    
+    # Находим предмет в базе данных
+    item = InventoryItem.query.filter_by(
+        user_id=session['user_id'],
+        item_type=item_type
+    ).first()
+    
+    if item:
+        try:
+            # Удаляем файл изображения
+            if item.image_path:
+                file_path = os.path.join(app.config['UPLOAD_FOLDER'], item.image_path)
+                if os.path.exists(file_path):
+                    os.remove(file_path)
+            
+            # Удаляем запись из БД
+            db.session.delete(item)
+            db.session.commit()
+            flash('Предмет успешно удален', 'success')
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Ошибка при удалении: {str(e)}', 'error')
+    
+    return redirect(url_for('profile'))
+
+@app.route('/edit/<item_type>', methods=['GET', 'POST'])
+def edit_item(item_type):
+    if 'user_id' not in session:
+        return redirect(url_for('index'))
+    
+    item = InventoryItem.query.filter_by(
+        user_id=session['user_id'],
+        item_type=item_type
+    ).first_or_404()
+    
+    if request.method == 'POST':
+        # Обработка загрузки нового изображения
+        file = request.files.get('image')
+        if file and allowed_file(file.filename):
+            # Удаляем старое изображение
+            if item.image_path:
+                old_file = os.path.join(app.config['UPLOAD_FOLDER'], item.image_path)
+                if os.path.exists(old_file):
+                    os.remove(old_file)
+            
+            # Сохраняем новое изображение
+            filename = secure_filename(f"{session['user_id']}_{item_type}.{file.filename.rsplit('.', 1)[1].lower()}")
+            filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            file.save(filepath)
+            item.image_path = filename
+        
+        # Обновляем информацию
+        item.description = request.form['description']
+        item.pros = request.form['pros']
+        item.cons = request.form['cons']
+        item.rating = int(request.form['rating'])
+        
+        db.session.commit()
+        flash('Изменения сохранены!', 'success')
+        return redirect(url_for('profile'))
+    
+    return render_template('edit.html', item=item, item_type=item_type)
 
 if __name__ == '__main__':
     if not os.path.exists(app.config['UPLOAD_FOLDER']):
