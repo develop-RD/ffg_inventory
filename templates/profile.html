@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="profile-container">
+    <div class="profile-header">
+        <h2>Инвентарь</h2>
+        <div class="user-info">
+            <span>{{ username }}</span>
+            <a href="{{ url_for('logout') }}" class="logout-btn">Выйти</a>
+        </div>
+    </div>
+    
+    <div class="inventory-grid">
+        <!-- Голова -->
+        <div class="inventory-cell head-cell">
+            {% if inventory.head %}
+                <img src="{{ url_for('static', filename='uploads/' + inventory.head.image_path) }}" 
+                     alt="Голова" 
+                     data-description="{{ inventory.head.description }}"
+                     data-pros="{{ inventory.head.pros }}"
+                     data-cons="{{ inventory.head.cons }}"
+                     data-rating="{{ inventory.head.rating }}">
+                <div class="item-tooltip"></div>
+            {% else %}
+                <a href="{{ url_for('upload', item_type='head') }}" class="add-item">+</a>
+            {% endif %}
+        </div>
+        
+        <!-- Туловище -->
+        <div class="inventory-cell torso-cell">
+            {% if inventory.torso %}
+                <img src="{{ url_for('static', filename='uploads/' + inventory.torso.image_path) }}" 
+                     alt="Туловище" 
+                     data-description="{{ inventory.torso.description }}"
+                     data-pros="{{ inventory.torso.pros }}"
+                     data-cons="{{ inventory.torso.cons }}"
+                     data-rating="{{ inventory.torso.rating }}">
+                <div class="item-tooltip"></div>
+            {% else %}
+                <a href="{{ url_for('upload', item_type='torso') }}" class="add-item">+</a>
+            {% endif %}
+        </div>
+        
+        <!-- Перчатки -->
+        <div class="inventory-cell gloves-cell">
+            {% if inventory.gloves %}
+                <img src="{{ url_for('static', filename='uploads/' + inventory.gloves.image_path) }}" 
+                     alt="Перчатки" 
+                     data-description="{{ inventory.gloves.description }}"
+                     data-pros="{{ inventory.gloves.pros }}"
+                     data-cons="{{ inventory.gloves.cons }}"
+                     data-rating="{{ inventory.gloves.rating }}">
+                <div class="item-tooltip"></div>
+            {% else %}
+                <a href="{{ url_for('upload', item_type='gloves') }}" class="add-item">+</a>
+            {% endif %}
+        </div>
+        
+        <!-- Штаны -->
+        <div class="inventory-cell pants-cell">
+            {% if inventory.pants %}
+                <img src="{{ url_for('static', filename='uploads/' + inventory.pants.image_path) }}" 
+                     alt="Штаны" 
+                     data-description="{{ inventory.pants.description }}"
+                     data-pros="{{ inventory.pants.pros }}"
+                     data-cons="{{ inventory.pants.cons }}"
+                     data-rating="{{ inventory.pants.rating }}">
+                <div class="item-tooltip"></div>
+            {% else %}
+                <a href="{{ url_for('upload', item_type='pants') }}" class="add-item">+</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

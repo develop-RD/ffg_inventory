@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="upload-container">
+    <h2>Добавить предмет: {{ item_type|title }}</h2>
+    
+    <form method="POST" enctype="multipart/form-data" class="upload-form">
+        <div class="form-group">
+            <label for="image">Изображение:</label>
+            <input type="file" id="image" name="image" accept="image/*" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="description">Описание:</label>
+            <textarea id="description" name="description" required></textarea>
+        </div>
+        
+        <div class="form-group">
+            <label for="pros">Плюсы:</label>
+            <textarea id="pros" name="pros" required></textarea>
+        </div>
+        
+        <div class="form-group">
+            <label for="cons">Минусы:</label>
+            <textarea id="cons" name="cons" required></textarea>
+        </div>
+        
+        <div class="form-group">
+            <label for="rating">Рейтинг (1-5):</label>
+            <input type="number" id="rating" name="rating" min="1" max="5" required>
+        </div>
+        
+        <button type="submit">Сохранить</button>
+        <a href="{{ url_for('profile') }}" class="cancel-btn">Отмена</a>
+    </form>
+</div>
+{% endblock %}
