@@ -1,4 +1,4 @@
-/* Общие стили */
+/* Основные стили */
 body {
     font-family: 'Arial', sans-serif;
     margin: 0;
@@ -7,196 +7,146 @@ body {
     color: #333;
 }
 
-.flash-messages {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    z-index: 1000;
+header {
+    background-color: #333;
+    color: white;
+    padding: 1rem;
+}
+
+nav {
+    display: flex;
+    gap: 1rem;
+}
+
+nav a {
+    color: white;
+    text-decoration: none;
+}
+
+.flashes {
+    margin: 1rem;
 }
 
 .flash {
-    padding: 10px 15px;
-    margin-bottom: 10px;
+    padding: 0.5rem 1rem;
+    margin-bottom: 0.5rem;
     border-radius: 4px;
-    animation: fadeIn 0.3s;
 }
 
 .flash.success {
     background-color: #d4edda;
     color: #155724;
-    border: 1px solid #c3e6cb;
 }
 
 .flash.error {
     background-color: #f8d7da;
     color: #721c24;
-    border: 1px solid #f5c6cb;
 }
 
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-20px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-/* Страница входа/регистрации */
-.auth-container {
-    max-width: 800px;
-    margin: 50px auto;
-    padding: 20px;
-    background-color: white;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
-}
-
-.auth-container h1 {
-    text-align: center;
-    margin-bottom: 30px;
-}
-
-.auth-forms {
-    display: flex;
-    justify-content: space-between;
-    gap: 20px;
-}
-
-.form-container {
-    flex: 1;
-    padding: 20px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-}
-
-.form-container h2 {
-    margin-top: 0;
-    text-align: center;
-}
-
-.form-group {
-    margin-bottom: 15px;
-}
-
-.form-group label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
-}
-
-.form-group input,
-.form-group textarea {
-    width: 100%;
-    padding: 8px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    box-sizing: border-box;
-}
-
-button {
-    background-color: #4CAF50;
-    color: white;
-    padding: 10px 15px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    width: 100%;
-    font-size: 16px;
-}
-
-button:hover {
-    background-color: #45a049;
-}
-
-/* Личный кабинет */
+/* Стили профиля */
 .profile-container {
     max-width: 900px;
-    margin: 20px auto;
-    padding: 20px;
+    margin: 2rem auto;
+    padding: 1rem;
     background-color: white;
     border-radius: 8px;
     box-shadow: 0 0 10px rgba(0,0,0,0.1);
 }
 
-.profile-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 30px;
-    padding-bottom: 15px;
-    border-bottom: 1px solid #eee;
+.profile-actions {
+    margin-bottom: 1rem;
 }
 
-.user-info {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-}
-
-.logout-btn {
-    padding: 5px 10px;
-    background-color: #f44336;
+.btn {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    background-color: #4CAF50;
     color: white;
     text-decoration: none;
     border-radius: 4px;
-    font-size: 14px;
 }
 
-.logout-btn:hover {
-    background-color: #d32f2f;
-}
-
-/* Инвентарь */
+/* Сетка инвентаря */
 .inventory-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     grid-template-rows: repeat(3, 150px);
-    gap: 15px;
-    margin-top: 30px;
+    gap: 1rem;
 }
 
 .inventory-cell {
+    position: relative;
     border: 2px dashed #ccc;
     border-radius: 8px;
     display: flex;
     justify-content: center;
     align-items: center;
-    position: relative;
-    overflow: hidden;
     background-color: #f9f9f9;
-    transition: all 0.3s;
 }
 
-.inventory-cell:hover {
-    border-color: #999;
+.head-cell { grid-column: 2; grid-row: 1; }
+.torso-cell { grid-column: 2; grid-row: 2; }
+.gloves-cell { grid-column: 3; grid-row: 2; }
+.pants-cell { grid-column: 2; grid-row: 3; }
+
+.cell-label {
+    position: absolute;
+    top: -25px;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    font-weight: bold;
 }
 
-.inventory-cell img {
+.item-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.item-container img {
     max-width: 100%;
     max-height: 100%;
     object-fit: contain;
+}
+
+.item-controls {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    display: flex;
+    gap: 5px;
+    z-index: 20;
+}
+
+.edit-btn, .delete-btn {
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     cursor: pointer;
+    border: none;
 }
 
-.head-cell {
-    grid-column: 2;
-    grid-row: 1;
+.edit-btn {
+    background-color: #4CAF50;
+    color: white;
+    text-decoration: none;
 }
 
-.torso-cell {
-    grid-column: 2;
-    grid-row: 2;
+.delete-btn {
+    background-color: #ff4444;
+    color: white;
 }
 
-.gloves-cell {
-    grid-column: 3;
-    grid-row: 2;
-}
-
-.pants-cell {
-    grid-column: 2;
-    grid-row: 3;
+.delete-form {
+    margin: 0;
 }
 
 .add-item {
-    font-size: 40px;
+    font-size: 2rem;
     color: #999;
     text-decoration: none;
     display: flex;
@@ -206,12 +156,11 @@ button:hover {
     height: 100%;
 }
 
-.add-item:hover {
-    color: #666;
-    background-color: #eee;
+.empty-slot {
+    color: #999;
+    font-style: italic;
 }
 
-/* Всплывающая подсказка */
 .item-tooltip {
     position: absolute;
     bottom: -100%;
@@ -219,144 +168,60 @@ button:hover {
     right: 0;
     background-color: rgba(0,0,0,0.8);
     color: white;
-    padding: 10px;
-    transition: bottom 0.5s ease;
+    padding: 0.5rem;
+    transition: bottom 0.3s ease;
     z-index: 10;
-    border-radius: 0 0 5px 5px;
-    font-size: 14px;
+    pointer-events: none;
 }
 
 .inventory-cell:hover .item-tooltip {
     bottom: 0;
 }
-
-/* Форма загрузки */
-.upload-container {
-    max-width: 600px;
-    margin: 30px auto;
-    padding: 20px;
+/* Стили для списка пользователей */
+.user-list-container {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 1rem;
     background-color: white;
     border-radius: 8px;
     box-shadow: 0 0 10px rgba(0,0,0,0.1);
 }
 
-.upload-form {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
+.user-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
 }
 
-.cancel-btn {
-    display: inline-block;
-    padding: 10px 15px;
-    background-color: #f44336;
-    color: white;
-    text-decoration: none;
+.user-card {
+    padding: 1rem;
+    background-color: #f5f5f5;
     border-radius: 4px;
-    text-align: center;
-    margin-top: 10px;
-}
-
-.cancel-btn:hover {
-    background-color: #d32f2f;
-}
-
-/* Стили для контейнера предмета */
-.item-container {
-    position: relative;
-    width: 100%;
-    height: 100%;
-}
-
-/* Стили для кнопки удаления */
-.delete-form {
-    margin: 0;
-}
-.delete-btn {
-    background-color: #ff4444;
-    color: white;
-    border: none;
-    border-radius: 50%;
-    width: 25px;
-    height: 25px;
-    font-size: 16px;
-    line-height: 1;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0;
     transition: all 0.3s;
 }
 
-.delete-btn:hover {
-    background-color: #cc0000;
-    transform: scale(1.1);
+.user-card:hover {
+    background-color: #e0e0e0;
+    transform: translateY(-2px);
 }
 
-/* Стили для контейнера кнопок управления */
-.item-controls {
-    position: absolute;
-    top: 5px;
-    right: 5px;
-    display: flex;
-    gap: 5px;
-    z-index: 30;
-}
-/* Кнопка редактирования */
-.edit-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 25px;
-    height: 25px;
-    background-color: #4CAF50;
-    color: white;
-    border-radius: 50%;
+.user-link {
     text-decoration: none;
-    font-size: 14px;
-    transition: all 0.3s;
-}
-
-.edit-btn:hover {
-    background-color: #45a049;
-    transform: scale(1.1);
-}
-
-/* Стили для страницы редактирования */
-.edit-container {
-    max-width: 600px;
-    margin: 30px auto;
-    padding: 20px;
-    background-color: white;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
-}
-
-.current-image {
-    max-width: 200px;
-    max-height: 200px;
+    color: #333;
     display: block;
-    margin: 10px 0;
-    border: 1px solid #ddd;
-    border-radius: 4px;
 }
 
-.form-actions {
+.username {
+    font-weight: bold;
+}
+
+.profile-nav {
     display: flex;
-    gap: 10px;
-    margin-top: 20px;
+    justify-content: space-between;
+    margin-bottom: 1rem;
 }
 
-.save-btn {
-    background-color: #4CAF50;
-    color: white;
-    padding: 10px 15px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-.save-btn:hover {
-    background-color: #45a049;
+.back-btn {
+    background-color: #6c757d;
 }

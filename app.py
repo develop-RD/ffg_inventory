@@ -1,8 +1,11 @@
-import os
-from flask import Flask, render_template, request, redirect, url_for, flash, session
+from flask import Flask, render_template, request, redirect, url_for, flash, session, abort
 from flask_sqlalchemy import SQLAlchemy
+from flask_login import LoginManager, UserMixin, login_user, logout_user, current_user, login_required
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
+import os
+import uuid
+
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = '2079acc5744b8f1fe9b9c84cb9a7a21ed531bbca08574b035a2bf52f4bf6cbe7'
@@ -10,111 +13,139 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///inventory.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
 app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg', 'gif'}
-
 db = SQLAlchemy(app)
-# Создаем папку для загрузок, если ее нет
-if not os.path.exists(app.config['UPLOAD_FOLDER']):
-    os.makedirs(app.config['UPLOAD_FOLDER'])
+login_manager = LoginManager(app)
+login_manager.login_view = 'login'
 
-# Модель пользователя
-class User(db.Model):
+class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
     password = db.Column(db.String(120), nullable=False)
     items = db.relationship('InventoryItem', backref='user', lazy=True, cascade="all, delete-orphan")
 
-# Модель предмета инвентаря
 class InventoryItem(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    item_type = db.Column(db.String(20), nullable=False)  # head, torso, gloves, pants
+    item_type = db.Column(db.String(20), nullable=False)
     image_path = db.Column(db.String(255))
     description = db.Column(db.Text)
     pros = db.Column(db.Text)
     cons = db.Column(db.Text)
     rating = db.Column(db.Integer)
 
-# Создаем таблицы в БД
-with app.app_context():
-    db.create_all()
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
 
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
 
-# Главная страница (вход/регистрация)
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/users/search')
+@login_required
+def user_search():
+    query = request.args.get('q', '')
+    users = User.query.filter(User.username.ilike(f'%{query}%')).all()
+    return render_template('users.html', users=users, search_query=query)
+
+@app.route('/users')
+@login_required
+def user_list():
+    users = User.query.order_by(User.username).all()
+    return render_template('users.html', users=users)
+
+@app.route('/')
 def index():
+    return render_template('login.html')
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if current_user.is_authenticated:
+        return redirect(url_for('my_profile'))
+    
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+        
+        if not username or not password:
+            flash('Заполните все поля')
+            return redirect(url_for('login'))
+        
+        user = User.query.filter_by(username=username).first()
+        
+        if user and check_password_hash(user.password, password):
+            login_user(user)
+            next_page = request.args.get('next')
+            return redirect(next_page or url_for('my_profile'))
+        
+        flash('Неверное имя пользователя или пароль')
+        return redirect(url_for('login'))
+    
+    return render_template('login.html')
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
         
-        if 'register' in request.form:
-            # Регистрация нового пользователя
-            existing_user = User.query.filter_by(username=username).first()
-            if existing_user:
-                flash('Пользователь с таким именем уже существует', 'error')
-                return redirect(url_for('index'))
-            
-            hashed_password = generate_password_hash(password,method='pbkdf2:sha256') 
-            new_user = User(username=username, password=hashed_password)
-            db.session.add(new_user)
-            db.session.commit()
-            
-            flash('Регистрация прошла успешно! Теперь вы можете войти.', 'success')
-            return redirect(url_for('index'))
+        if User.query.filter_by(username=username).first():
+            flash('Имя пользователя уже занято')
+            return redirect(url_for('register'))
         
-        elif 'login' in request.form:
-            # Вход существующего пользователя
-            user = User.query.filter_by(username=username).first()
-            if user and check_password_hash(user.password, password):
-                session['user_id'] = user.id
-                session['username'] = user.username
-                return redirect(url_for('profile'))
-            else:
-                flash('Неверное имя пользователя или пароль', 'error')
-                return redirect(url_for('index'))
+        hashed_password = generate_password_hash(password)
+        new_user = User(username=username, password=hashed_password)
+        db.session.add(new_user)
+        db.session.commit()
+        
+        login_user(new_user)
+        return redirect(url_for('my_profile'))
     
-    return render_template('index.html')
+    return render_template('register.html')
 
-# Личный кабинет с инвентарем
-@app.route('/profile')
-def profile():
-    if 'user_id' not in session:
-        return redirect(url_for('index'))
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('index'))
+
+@app.route('/myprofile')
+@login_required
+def my_profile():
+    return redirect(url_for('view_profile', username=current_user.username))
+
+@app.route('/profile/<username>')
+def view_profile(username):
+    viewed_user = User.query.filter_by(username=username).first_or_404()
+    items = InventoryItem.query.filter_by(user_id=viewed_user.id).all()
     
-    user_id = session['user_id']
-    items = InventoryItem.query.filter_by(user_id=user_id).all()
-    
-    # Группируем предметы по типам для удобного отображения
     inventory = {
-        'head': next((item for item in items if item.item_type == 'head'), None),
-        'torso': next((item for item in items if item.item_type == 'torso'), None),
-        'gloves': next((item for item in items if item.item_type == 'gloves'), None),
-        'pants': next((item for item in items if item.item_type == 'pants'), None)
+        'head': next((i for i in items if i.item_type == 'head'), None),
+        'torso': next((i for i in items if i.item_type == 'torso'), None),
+        'gloves': next((i for i in items if i.item_type == 'gloves'), None),
+        'pants': next((i for i in items if i.item_type == 'pants'), None)
     }
     
-    return render_template('profile.html', inventory=inventory, username=session['username'])
+    is_owner = current_user.is_authenticated and current_user.id == viewed_user.id
+    return render_template('profile.html',
+                         inventory=inventory,
+                         viewed_user=viewed_user,
+                         is_owner=is_owner)
 
-# Загрузка изображения и информации о предмете
 @app.route('/upload/<item_type>', methods=['GET', 'POST'])
+@login_required
 def upload(item_type):
-    if 'user_id' not in session:
-        return redirect(url_for('index'))
-    
     if request.method == 'POST':
-        # Обработка загрузки файла
         file = request.files['image']
         if file and allowed_file(file.filename):
-            filename = secure_filename(f"{session['user_id']}_{item_type}.{file.filename.rsplit('.', 1)[1].lower()}")
+            filename = secure_filename(f"{current_user.id}_{item_type}.{file.filename.rsplit('.', 1)[1].lower()}")
             filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             file.save(filepath)
             
-            # Создаем или обновляем запись в БД
-            item = InventoryItem.query.filter_by(user_id=session['user_id'], item_type=item_type).first()
+            item = InventoryItem.query.filter_by(user_id=current_user.id, item_type=item_type).first()
             if not item:
                 item = InventoryItem(
-                    user_id=session['user_id'],
+                    user_id=current_user.id,
                     item_type=item_type,
                     image_path=filename,
                     description=request.form['description'],
@@ -124,6 +155,11 @@ def upload(item_type):
                 )
                 db.session.add(item)
             else:
+                if item.image_path:
+                    old_file = os.path.join(app.config['UPLOAD_FOLDER'], item.image_path)
+                    if os.path.exists(old_file):
+                        os.remove(old_file)
+                
                 item.image_path = filename
                 item.description = request.form['description']
                 item.pros = request.form['pros']
@@ -131,86 +167,30 @@ def upload(item_type):
                 item.rating = int(request.form['rating'])
             
             db.session.commit()
-            flash('Предмет успешно сохранен!', 'success')
-            return redirect(url_for('profile'))
+            return redirect(url_for('my_profile'))
     
     return render_template('upload.html', item_type=item_type)
 
-# Выход из системы
-@app.route('/logout')
-def logout():
-    session.clear()
-    return redirect(url_for('index'))
-
-
 @app.route('/delete/<item_type>', methods=['POST'])
+@login_required
 def delete_item(item_type):
-    if 'user_id' not in session:
-        return redirect(url_for('index'))
-    
-    # Находим предмет в базе данных
-    item = InventoryItem.query.filter_by(
-        user_id=session['user_id'],
-        item_type=item_type
-    ).first()
-    
+    item = InventoryItem.query.filter_by(user_id=current_user.id, item_type=item_type).first()
     if item:
-        try:
-            # Удаляем файл изображения
-            if item.image_path:
-                file_path = os.path.join(app.config['UPLOAD_FOLDER'], item.image_path)
-                if os.path.exists(file_path):
-                    os.remove(file_path)
-            
-            # Удаляем запись из БД
-            db.session.delete(item)
-            db.session.commit()
-            flash('Предмет успешно удален', 'success')
-        except Exception as e:
-            db.session.rollback()
-            flash(f'Ошибка при удалении: {str(e)}', 'error')
-    
-    return redirect(url_for('profile'))
-
-@app.route('/edit/<item_type>', methods=['GET', 'POST'])
-def edit_item(item_type):
-    if 'user_id' not in session:
-        return redirect(url_for('index'))
-    
-    item = InventoryItem.query.filter_by(
-        user_id=session['user_id'],
-        item_type=item_type
-    ).first_or_404()
-    
-    if request.method == 'POST':
-        # Обработка загрузки нового изображения
-        file = request.files.get('image')
-        if file and allowed_file(file.filename):
-            # Удаляем старое изображение
-            if item.image_path:
-                old_file = os.path.join(app.config['UPLOAD_FOLDER'], item.image_path)
-                if os.path.exists(old_file):
-                    os.remove(old_file)
-            
-            # Сохраняем новое изображение
-            filename = secure_filename(f"{session['user_id']}_{item_type}.{file.filename.rsplit('.', 1)[1].lower()}")
-            filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            file.save(filepath)
-            item.image_path = filename
+        if item.image_path:
+            file_path = os.path.join(app.config['UPLOAD_FOLDER'], item.image_path)
+            if os.path.exists(file_path):
+                os.remove(file_path)
         
-        # Обновляем информацию
-        item.description = request.form['description']
-        item.pros = request.form['pros']
-        item.cons = request.form['cons']
-        item.rating = int(request.form['rating'])
-        
+        db.session.delete(item)
         db.session.commit()
-        flash('Изменения сохранены!', 'success')
-        return redirect(url_for('profile'))
+        flash('Предмет удален', 'success')
     
-    return render_template('edit.html', item=item, item_type=item_type)
+    return redirect(url_for('my_profile'))
 
 if __name__ == '__main__':
-    if not os.path.exists(app.config['UPLOAD_FOLDER']):
-        os.makedirs(app.config['UPLOAD_FOLDER'])
+    with app.app_context():
+        db.create_all()
+        if not os.path.exists(app.config['UPLOAD_FOLDER']):
+            os.makedirs(app.config['UPLOAD_FOLDER'])
     app.run(debug=True)
+

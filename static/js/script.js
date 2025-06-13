@@ -1,8 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Обработка всплывающих подсказок
-    const inventoryCells = document.querySelectorAll('.inventory-cell');
-    
-    inventoryCells.forEach(cell => {
+    // Инициализация подсказок
+    document.querySelectorAll('.inventory-cell').forEach(cell => {
         const img = cell.querySelector('img');
         const tooltip = cell.querySelector('.item-tooltip');
         
@@ -24,19 +22,5 @@ document.addEventListener('DOMContentLoaded', function() {
                 <p><strong>Рейтинг:</strong> ${stars}</p>
             `;
         }
-
-        cell.addEventListener('mouseenter', function() {
-        const controls = this.querySelector('.item-controls');
-        if (controls) {
-            controls.style.opacity = '1';
-        }
-        });
-    
-        cell.addEventListener('mouseleave', function() {
-        const controls = this.querySelector('.item-controls');
-        if (controls) {
-            controls.style.opacity = '0.7';
-        }
-        });
     });
 });
