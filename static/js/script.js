@@ -42,8 +42,12 @@ function showTooltip() {
        /* Вывод информации только для определённых объектов*/ 
         // Head
         if (img && (img.getAttribute('alt') == "Голова") && tooltip){
+            const description = img.getAttribute('data-description');
             const pros = img.getAttribute('data-pros');
-            fillPros(pros);
+            const cons = img.getAttribute('data-cons');
+            const rating = img.getAttribute('data-rating');
+
+            fillPros(description,pros,cons,rating);
         }
     });
 }
@@ -54,28 +58,46 @@ function closeTooltip() {
 
 
 
-function fillPros(Pros) {
-    const prosList = [Pros];
+function fillPros(desc,Pros,cons,rating) {
+    const prosList = Pros;
+    const consList = [cons];
     
     const prosContainer = document.querySelector('.pros ul');
-    
+    const consContainer = document.querySelector('.cons li');
     // Очищаем существующий список
-    prosContainer.innerHTML = '';
+    prosContainer.innerHTML = '<p><strong>Плюсы:</strong> ${prosList} </p>';
+    //consContainer.innerHTML = '';
     
-    // Добавляем каждый пункт в список
+/*    // Добавляем каждый пункт в список
     prosList.forEach(pro => {
         const li = document.createElement('li');
         li.textContent = pro;
+        console.log("pros=",pro)
         prosContainer.appendChild(li);
     });
+  */  
+    consList.forEach(co => {
+        const li = document.createElement('li');
+        li.textContent = co;
+        console.log("cons=",co)
+        consContainer.appendChild(li);
+    });
+
 }
 
 // Инициализация при загрузке страницы
 document.addEventListener('DOMContentLoaded', function() {
     // Создаем ul элемент если его нет
     const prosDiv = document.querySelector('.pros');
+    const consDiv = document.querySelector('.cons');
+   
     if (prosDiv && !prosDiv.querySelector('ul')) {
         const ul = document.createElement('ul');
         prosDiv.appendChild(ul);
     }
+    if (consDiv && !consDiv.querySelector('li')) {
+        const li = document.createElement('li');
+        consDiv.appendChild(li);
+    }
+
  });
