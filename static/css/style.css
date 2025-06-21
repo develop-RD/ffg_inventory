@@ -161,22 +161,104 @@ nav a {
     font-style: italic;
 }
 
+/* Настройки всплывающей подсказки */
 .item-tooltip {
-    position: absolute;
-    bottom: -100%;
-    left: 0;
-    right: 0;
-    background-color: rgba(0,0,0,0.8);
+    padding: 15px 25px;
+    background-color: #4CAF50;
     color: white;
-    padding: 0.5rem;
-    transition: bottom 0.3s ease;
-    z-index: 10;
-    pointer-events: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: center;
+    font-size: 18px;
+    margin: 50px auto;
+    width: 250px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    transition: background-color 0.3s;
+}
+
+.item-tooltip:hover {
+    background-color: #45a049;
+}
+
+.tooltip-container {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+}
+
+.tooltip-content {
+    background-color: white;
+    padding: 25px;
+    border-radius: 8px;
+    width: 80%;
+    max-width: 600px;
+    position: relative;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.close-btn {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 24px;
+    cursor: pointer;
+    color: #aaa;
+}
+
+.close-btn:hover {
+    color: #333;
 }
 
 .inventory-cell:hover .item-tooltip {
     bottom: 0;
 }
+.details {
+    display: flex;
+    justify-content: space-between;
+    margin: 20px 0;
+}
+
+.pros, .cons {
+    width: 48%;
+}
+
+.pros ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.pros li:before {
+    content: "✓ ";
+    color: green;
+}
+
+.cons ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.cons li:before {
+    content: "✗ ";
+    color: red;
+}
+
+.rating {
+    margin-top: 20px;
+}
+
+.stars {
+    color: gold;
+    font-size: 24px;
+    margin: 5px 0;
+}
+
 /* Стили для списка пользователей */
 .user-list-container {
     max-width: 800px;
