@@ -157,8 +157,8 @@ def upload(item_type):
             else:
                 if item.image_path:
                     old_file = os.path.join(app.config['UPLOAD_FOLDER'], item.image_path)
-                    if os.path.exists(old_file):
-                        os.remove(old_file)
+                    #if os.path.exists(old_file):
+                    #    os.remove(old_file)
                 
                 item.image_path = filename
                 item.description = request.form['description']

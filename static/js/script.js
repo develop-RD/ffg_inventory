@@ -52,14 +52,8 @@ function closeTooltip() {
     document.getElementById('tooltipContainer').style.display = 'none';
 }
 
-/*
-// Close tooltip if clicked outside of content
-document.getElementById('tooltipContainer').addEventListener('click', function(e) {
-    if (e.target === this) {
-        closeTooltip();
-    }
-});
-*/
+
+
 function fillPros(Pros) {
     const prosList = [Pros];
     
