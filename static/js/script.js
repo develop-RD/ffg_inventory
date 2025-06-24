@@ -34,6 +34,18 @@ function showTooltip() {
 
 function showTooltip() {
     console.log("opened");
+    const prosDiv = document.querySelector('.pros');
+    const consDiv = document.querySelector('.cons');
+
+    if (prosDiv && !prosDiv.querySelector('ul')) {
+        const ul = document.createElement('ul');
+        prosDiv.appendChild(ul);
+    }
+    if (consDiv && !consDiv.querySelector('ul')) {
+        const li = document.createElement('ul');
+        consDiv.appendChild(li);
+    }
+
      document.getElementById('tooltipContainer').style.display = 'flex';
   // Инициализация подсказок
     document.querySelectorAll('.inventory-cell').forEach(cell =>{ 
@@ -54,43 +66,14 @@ function showTooltip() {
 
 function closeTooltip() {
     document.getElementById('tooltipContainer').style.display = 'none';
-}
 
-
-
-function fillPros(desc,Pros,cons,rating) {
-    const prosList = Pros;
-    const consList = [cons];
-    
-    const prosContainer = document.querySelector('.pros ul');
-    const consContainer = document.querySelector('.cons li');
-    // Очищаем существующий список
-    prosContainer.innerHTML = '<p><strong>Плюсы:</strong> ${prosList} </p>';
-    //consContainer.innerHTML = '';
-    
-/*    // Добавляем каждый пункт в список
-    prosList.forEach(pro => {
-        const li = document.createElement('li');
-        li.textContent = pro;
-        console.log("pros=",pro)
-        prosContainer.appendChild(li);
-    });
-  */  
-    consList.forEach(co => {
-        const li = document.createElement('li');
-        li.textContent = co;
-        console.log("cons=",co)
-        consContainer.appendChild(li);
-    });
-
-}
-
-// Инициализация при загрузке страницы
-document.addEventListener('DOMContentLoaded', function() {
+    const prosContainer = document.querySelector('.pros');
+    const consContainer = document.querySelector('.cons');
+    prosContainer.innerHTML = '';
+    consContainer.innerHTML = '';
     // Создаем ul элемент если его нет
     const prosDiv = document.querySelector('.pros');
     const consDiv = document.querySelector('.cons');
-   
     if (prosDiv && !prosDiv.querySelector('ul')) {
         const ul = document.createElement('ul');
         prosDiv.appendChild(ul);
@@ -100,4 +83,38 @@ document.addEventListener('DOMContentLoaded', function() {
         consDiv.appendChild(li);
     }
 
+
+}
+
+
+
+function fillPros(desc,Pros,cons,rating) {
+    const prosList = [Pros.split('\n')];
+    const consList = [cons.split('\n')];
+    
+    const prosContainer = document.querySelector('.pros');
+    const consContainer = document.querySelector('.cons');
+    /*Добавляем каждый пункт при выводе*/    
+    for (const elem of prosList[0]){
+        const li = document.createElement('li');
+        li.textContent = elem;
+        prosContainer.appendChild(li);
+    }
+
+    for (const elem of consList[0]){
+        const li = document.createElement('li');
+        li.textContent = elem;
+        consContainer.appendChild(li);
+    }
+
+    
+}
+
+// Инициализация при загрузке страницы
+document.addEventListener('DOMContentLoaded', function() {
+    // Создаем ul элемент если его нет
+    const prosDiv = document.querySelector('.pros');
+    const consDiv = document.querySelector('.cons');
+
+   
  });
