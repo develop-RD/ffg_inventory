@@ -34,9 +34,15 @@ function showTooltip() {
 
 function showTooltip() {
     console.log("opened");
+        
+
+
+     document.getElementById('tooltipContainer').style.display = 'flex';
+  // Инициализация подсказок
+    document.querySelectorAll('.inventory-cell').forEach(cell =>{ 
+    /*Создаём поля*/
     const prosDiv = document.querySelector('.pros');
     const consDiv = document.querySelector('.cons');
-
     if (prosDiv && !prosDiv.querySelector('ul')) {
         const ul = document.createElement('ul');
         prosDiv.appendChild(ul);
@@ -46,9 +52,6 @@ function showTooltip() {
         consDiv.appendChild(li);
     }
 
-     document.getElementById('tooltipContainer').style.display = 'flex';
-  // Инициализация подсказок
-    document.querySelectorAll('.inventory-cell').forEach(cell =>{ 
         const img = cell.querySelector('img');
         const tooltip = cell.querySelector('.item-tooltip');
        /* Вывод информации только для определённых объектов*/ 
@@ -62,36 +65,25 @@ function showTooltip() {
             fillPros(description,pros,cons,rating);
         }
     });
+
 }
 
 function closeTooltip() {
     document.getElementById('tooltipContainer').style.display = 'none';
-
+     /*Очищаем поля*/    
+    
     const prosContainer = document.querySelector('.pros');
     const consContainer = document.querySelector('.cons');
     prosContainer.innerHTML = '';
     consContainer.innerHTML = '';
-    // Создаем ul элемент если его нет
-    const prosDiv = document.querySelector('.pros');
-    const consDiv = document.querySelector('.cons');
-    if (prosDiv && !prosDiv.querySelector('ul')) {
-        const ul = document.createElement('ul');
-        prosDiv.appendChild(ul);
-    }
-    if (consDiv && !consDiv.querySelector('li')) {
-        const li = document.createElement('li');
-        consDiv.appendChild(li);
-    }
-
-
+   
 }
-
 
 
 function fillPros(desc,Pros,cons,rating) {
     const prosList = [Pros.split('\n')];
     const consList = [cons.split('\n')];
-    
+    console.log(rating);    
     const prosContainer = document.querySelector('.pros');
     const consContainer = document.querySelector('.cons');
     /*Добавляем каждый пункт при выводе*/    
