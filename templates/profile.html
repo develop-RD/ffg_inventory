@@ -43,10 +43,14 @@
                 <div class="tooltip-container" id="tooltipContainer">
                     <div class="tooltip-content">
                         <span class="close-btn" onclick="closeTooltip()">&times;</span>
-                            <div class="details" id="details"><h3>Описание</h3>  </div>
-                                <div class="pros" id="head_pros"><h2>Плюсы</h2>  </div>
-                                <div class="cons" id="head_cons"><h2>Минусы</h2> </div>
-                                <div class="rating"></div>
+                            <div class="details"></div>
+                                <div class="info-section">
+                                    <h3>Описание</h3>
+                                    <p>{{ inventory.head.description }}</p>
+                                </div>
+                                <div class="pros" id="head_pros"><h3>Плюсы</h3>  </div>
+                                <div class="cons" id="head_cons"><h3>Минусы</h3> </div>
+                                <div class="stars"><h4>Рейтинг {{inventory.head.rating}}/5 </h4></div>
                     </div>
                 </div>
             {% else %}

@@ -41,6 +41,7 @@ function showTooltip() {
   // Инициализация подсказок
     document.querySelectorAll('.inventory-cell').forEach(cell =>{ 
     /*Создаём поля*/
+    
     const prosDiv = document.querySelector('.pros');
     const consDiv = document.querySelector('.cons');
     if (prosDiv && !prosDiv.querySelector('ul')) {
@@ -83,7 +84,6 @@ function closeTooltip() {
 function fillPros(desc,Pros,cons,rating) {
     const prosList = [Pros.split('\n')];
     const consList = [cons.split('\n')];
-    console.log(rating);    
     const prosContainer = document.querySelector('.pros');
     const consContainer = document.querySelector('.cons');
     /*Добавляем каждый пункт при выводе*/    

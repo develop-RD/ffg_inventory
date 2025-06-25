@@ -225,6 +225,17 @@ nav a {
     margin: 20px 0;
 }
 
+.info-section {
+    margin-bottom: 20px;
+}
+
+.info-section h3 {
+    margin-top: 0;
+    color: #444;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 5px;
+}
+
 .pros, .cons {
     width: 48%;
 }
@@ -249,13 +260,9 @@ nav a {
     color: red;
 }
 
-.rating {
-    margin-top: 20px;
-}
-
 .stars {
     color: gold;
-    font-size: 24px;
+    font-size: 18px;
     margin: 5px 0;
 }
 
