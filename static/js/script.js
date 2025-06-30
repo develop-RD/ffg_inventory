@@ -41,7 +41,27 @@ function showTooltip() {
   // Инициализация подсказок
     document.querySelectorAll('.inventory-cell').forEach(cell =>{ 
     /*Создаём поля*/
+        cell.addEventListener('click',function(event){
+            // event.currentTarget - это элемент, на который кликнули
+            const clickedCell = event.currentTarget;
+            console.log('Clicked cell:', clickedCell);
+            
+            // Работаем только с этой ячейкой
+            if (clickedCell.classList.contains('head-cell')) {
+                handleCell(clickedCell);
+            } else if (clickedCell.classList.contains('pants-cell')) {
+                handleCell(clickedCell);
+            }
+        });
+        
     
+    
+    });
+
+}
+
+function handleCell(cell) {
+    // Логика только для *-cell
     const prosDiv = document.querySelector('.pros');
     const consDiv = document.querySelector('.cons');
     if (prosDiv && !prosDiv.querySelector('ul')) {
@@ -54,29 +74,18 @@ function showTooltip() {
     }
 
         const img = cell.querySelector('img');
-        const tooltip = cell.querySelector('.item-tooltip');
-       /* Вывод информации только для определённых объектов*/ 
-        // Head
-        if (img && (img.getAttribute('alt') == "Голова") && tooltip){
-            const description = img.getAttribute('data-description');
-            const pros = img.getAttribute('data-pros');
-            const cons = img.getAttribute('data-cons');
-            const rating = img.getAttribute('data-rating');
 
-            fillPros(description,pros,cons,rating);
-        }
-    });
+       /* Вывод информации только для определённых объектов*/ 
+        const description = img.getAttribute('data-description');
+        const pros = img.getAttribute('data-pros');
+        const cons = img.getAttribute('data-cons');
+        const rating = img.getAttribute('data-rating');
+        fillPros(description,pros,cons,rating);
 
 }
 
 function closeTooltip() {
     document.getElementById('tooltipContainer').style.display = 'none';
-     /*Очищаем поля*/    
-    
-    const prosContainer = document.querySelector('.pros');
-    const consContainer = document.querySelector('.cons');
-    prosContainer.innerHTML = '';
-    consContainer.innerHTML = '';
    
 }
 
@@ -84,8 +93,30 @@ function closeTooltip() {
 function fillPros(desc,Pros,cons,rating) {
     const prosList = [Pros.split('\n')];
     const consList = [cons.split('\n')];
+    const detContainer = document.querySelector('.details');
     const prosContainer = document.querySelector('.pros');
     const consContainer = document.querySelector('.cons');
+    const starsContainer = document.querySelector('.stars');
+    /*Очищаем перед отправкой*/
+    prosContainer.innerHTML = '<h3>Плюсы</h3>';
+    consContainer.innerHTML = '<h3>Минусы</h3>';
+    detContainer.innerHTML = `
+      <section>
+        <h3><strong>Описание</strong></h3>
+        <div>${desc}</div>
+      </section>
+    `;
+    let stars = '';
+    for (let i = 0; i < 5; i++) {
+        stars += i < rating ? '★' : '☆';
+    }
+    starsContainer.innerHTML = `
+      <section>
+        <h3><strong>Рейтинг</strong></h3>
+        <div>${stars}</div>
+      </section>
+    `;
+
     /*Добавляем каждый пункт при выводе*/    
     for (const elem of prosList[0]){
         const li = document.createElement('li');
