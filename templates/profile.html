@@ -13,10 +13,7 @@
     {% endif %}
     <div class="profile-nav">
         <a href="{{ url_for('user_list') }}" class="btn back-btn">← Все пользователи</a>
-        {% if is_owner %}
-            <a href="{{ url_for('upload', item_type='head') }}" class="btn">Добавить предмет</a>
-        {% endif %}
-    </div>
+           </div>
     <div class="inventory-grid">
         <!-- Голова -->
         <div class="inventory-cell head-cell">
@@ -44,8 +41,7 @@
                     <div class="tooltip-content">
                         <span class="close-btn" onclick="closeTooltip()">&times;</span>
                             <div class="details"></div>
-                                <div class="info-section">
-                                </div>
+                                <div class="info-section"></div>
                                 <div class="pros" id="head_pros"><h3>Плюсы</h3>  </div>
                                 <div class="cons" id="head_cons"><h3>Минусы</h3> </div>
                                 <div class="stars"><h4>Рейтинг </h4></div>
@@ -61,10 +57,10 @@
         </div>
 
         <!-- Куртка -->
-        <div class="inventory-cell torso-cell" onclick="showTooltip()">
+        <div class="inventory-cell torso-cell"> 
             <div class="cell-label">Куртка</div>
             {% if inventory.torso %}
-                <div class="item-container">
+                <div class="item-container" onclick="showTooltip()">
                     <img src="{{ url_for('static', filename='uploads/' + inventory.torso.image_path) }}" 
                          alt="Куртка"
                          data-description="{{ inventory.torso.description }}"
@@ -87,13 +83,10 @@
                     <div class="tooltip-content">
                         <span class="close-btn" onclick="closeTooltip()">&times;</span>
                             <div class="details"></div>
-                                <div class="info-section">
-                                    <h3>Описание</h3>
-                                    <p>{{ inventory.torso.description }}</p>
-                                </div>
+                                <div class="info-section"></div>
                                 <div class="pros" id="head_pros"><h3>Плюсы</h3>  </div>
                                 <div class="cons" id="head_cons"><h3>Минусы</h3> </div>
-                                <div class="stars"><h4>Рейтинг {{inventory.torso.rating}}/5 </h4></div>
+                                <div class="stars"><h4>Рейтинг </h4></div>
                     </div>
                 </div>
 
@@ -107,10 +100,10 @@
         </div>
 
         <!-- Руки -->
-        <div class="inventory-cell gloves-cell" onclick="showTooltip()">
+        <div class="inventory-cell gloves-cell">
             <div class="cell-label">Руки</div>
             {% if inventory.gloves %}
-                <div class="item-container">
+                <div class="item-container" onclick="showTooltip()">
                     <img src="{{ url_for('static', filename='uploads/' + inventory.gloves.image_path) }}" 
                          alt="Перчатки"
                          data-description="{{ inventory.gloves.description }}"
@@ -127,19 +120,15 @@
                     </div>
                     {% endif %}
                     
-                    <div class="item-tooltip"></div>
                 </div>
                 <div class="tooltip-container" id="tooltipContainer">
                     <div class="tooltip-content">
                         <span class="close-btn" onclick="closeTooltip()">&times;</span>
                             <div class="details"></div>
-                                <div class="info-section">
-                                    <h3>Описание</h3>
-                                    <p>{{ inventory.gloves.description }}</p>
-                                </div>
+                                <div class="info-section"></div>
                                 <div class="pros" id="head_pros"><h3>Плюсы</h3>  </div>
                                 <div class="cons" id="head_cons"><h3>Минусы</h3> </div>
-                                <div class="stars"><h4>Рейтинг {{inventory.gloves.rating}}/5 </h4></div>
+                                <div class="stars"><h4>Рейтинг </h4></div>
                     </div>
                 </div>
 
@@ -172,18 +161,14 @@
                         </form>
                     </div>
                     {% endif %}
-                </div>
                  <div class="tooltip-container" id="tooltipContainer">
                     <div class="tooltip-content">
                         <span class="close-btn" onclick="closeTooltip()">&times;</span>
                             <div class="details"></div>
                                 <div class="info-section">
-                                    <h3>Описание</h3>
-                                    <p>{{ inventory.pants.description }}</p>
-                                </div>
                                 <div class="pros" id="head_pros"><h3>Плюсы</h3>  </div>
                                 <div class="cons" id="head_cons"><h3>Минусы</h3> </div>
-                                <div class="stars"><h4>Рейтинг {{inventory.pants.rating}}/5 </h4></div>
+                                <div class="stars"><h4>Рейтинг </h4></div>
                     </div>
                 </div>
 

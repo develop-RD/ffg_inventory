@@ -51,7 +51,12 @@ function showTooltip() {
                 handleCell(clickedCell);
             } else if (clickedCell.classList.contains('pants-cell')) {
                 handleCell(clickedCell);
+            }else if (clickedCell.classList.contains('torso-cell')) {
+                handleCell(clickedCell);
+            }else if (clickedCell.classList.contains('gloves-cell')) {
+                handleCell(clickedCell);
             }
+
         });
         
     
