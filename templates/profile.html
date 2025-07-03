@@ -15,13 +15,91 @@
         <a href="{{ url_for('user_list') }}" class="btn back-btn">← Все пользователи</a>
            </div>
     <div class="inventory-grid">
-        <!-- Голова -->
+         <!-- Горжет -->
+        <div class="inventory-cell gorget-cell">
+            <div class="cell-label">Горжет</div>
+            {% if inventory.gorget %}
+                <div class="item-container" onclick="showTooltip()">
+                    <img src="{{ url_for('static', filename='uploads/' + inventory.gorget.image_path) }}" 
+                        alt="Горжет"
+                        data-description="{{ inventory.gorget.description }}"
+                        data-pros="{{ inventory.gorget.pros }}"
+                        data-cons="{{ inventory.gorget.cons }}"
+                        data-rating="{{ inventory.gorget.rating }}">
+                    
+                    {% if is_owner %}
+                    <div class="item-controls">
+                        <a href="{{ url_for('upload', item_type='gorget') }}" class="edit-btn" title="Редактировать">✏️</a>
+                        <form action="{{ url_for('delete_item', item_type='gorget') }}" method="POST" class="delete-form">
+                            <button type="submit" class="delete-btn" title="Удалить" onclick="return confirm('Удалить этот предмет?')">×</button>
+                        </form>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="tooltip-container" id="tooltipContainer">
+                    <div class="tooltip-content">
+                        <span class="close-btn" onclick="closeTooltip()">&times;</span>
+                            <div class="details"></div>
+                                <div class="info-section"></div>
+                                <div class="pros" id="head_pros"><h3>Плюсы</h3>  </div>
+                                <div class="cons" id="head_cons"><h3>Минусы</h3> </div>
+                                <div class="stars"><h4>Рейтинг </h4></div>
+                    </div>
+                </div>
+            {% else %}
+                {% if is_owner %}
+                    <a href="{{ url_for('upload', item_type='gorget') }}" class="add-item">+</a>
+                {% else %}
+                    <div class="empty-slot" >Нет предмета</div>
+                {% endif %}
+            {% endif %}
+        </div>
+        <!-- Намасник -->
+        <div class="inventory-cell namasnik-cell">
+            <div class="cell-label">Намасник</div>
+            {% if inventory.namasnik %}
+                <div class="item-container" onclick="showTooltip()">
+                    <img src="{{ url_for('static', filename='uploads/' + inventory.namasnik.image_path) }}" 
+                        alt="Намасник"
+                        data-description="{{ inventory.namasnik.description }}"
+                        data-pros="{{ inventory.namasnik.pros }}"
+                        data-cons="{{ inventory.namasnik.cons }}"
+                        data-rating="{{ inventory.namasnik.rating }}">
+                    
+                    {% if is_owner %}
+                    <div class="item-controls">
+                        <a href="{{ url_for('upload', item_type='namasnik') }}" class="edit-btn" title="Редактировать">✏️</a>
+                        <form action="{{ url_for('delete_item', item_type='namasnik') }}" method="POST" class="delete-form">
+                            <button type="submit" class="delete-btn" title="Удалить" onclick="return confirm('Удалить этот предмет?')">×</button>
+                        </form>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="tooltip-container" id="tooltipContainer">
+                    <div class="tooltip-content">
+                        <span class="close-btn" onclick="closeTooltip()">&times;</span>
+                            <div class="details"></div>
+                                <div class="info-section"></div>
+                                <div class="pros" id="head_pros"><h3>Плюсы</h3>  </div>
+                                <div class="cons" id="head_cons"><h3>Минусы</h3> </div>
+                                <div class="stars"><h4>Рейтинг </h4></div>
+                    </div>
+                </div>
+            {% else %}
+                {% if is_owner %}
+                    <a href="{{ url_for('upload', item_type='namasnik') }}" class="add-item">+</a>
+                {% else %}
+                    <div class="empty-slot" >Нет предмета</div>
+                {% endif %}
+            {% endif %}
+        </div>
+      <!-- Голова -->
         <div class="inventory-cell head-cell">
-            <div class="cell-label">Голова</div>
+            <div class="cell-label">Маска</div>
             {% if inventory.head %}
                 <div class="item-container" onclick="showTooltip()">
                     <img src="{{ url_for('static', filename='uploads/' + inventory.head.image_path) }}" 
-                        alt="Голова"
+                        alt="Маска"
                         data-description="{{ inventory.head.description }}"
                         data-pros="{{ inventory.head.pros }}"
                         data-cons="{{ inventory.head.cons }}"
@@ -35,7 +113,6 @@
                         </form>
                     </div>
                     {% endif %}
-                        <div class="item-tooltip" ></div>
                 </div>
                 <div class="tooltip-container" id="tooltipContainer">
                     <div class="tooltip-content">
@@ -52,6 +129,87 @@
                     <a href="{{ url_for('upload', item_type='head') }}" class="add-item">+</a>
                 {% else %}
                     <div class="empty-slot" >Нет предмета</div>
+                {% endif %}
+            {% endif %}
+        </div>
+         <!-- Наплечники -->
+        <div class="inventory-cell naplech-cell">
+            <div class="cell-label">Наплечники</div>
+            {% if inventory.naplech %}
+                <div class="item-container" onclick="showTooltip()">
+                    <img src="{{ url_for('static', filename='uploads/' + inventory.naplech.image_path) }}" 
+                        alt="Наплечники"
+                        data-description="{{ inventory.naplech.description }}"
+                        data-pros="{{ inventory.naplech.pros }}"
+                        data-cons="{{ inventory.naplech.cons }}"
+                        data-rating="{{ inventory.naplech.rating }}">
+                    
+                    {% if is_owner %}
+                    <div class="item-controls">
+                        <a href="{{ url_for('upload', item_type='naplech') }}" class="edit-btn" title="Редактировать">✏️</a>
+                        <form action="{{ url_for('delete_item', item_type='naplech') }}" method="POST" class="delete-form">
+                            <button type="submit" class="delete-btn" title="Удалить" onclick="return confirm('Удалить этот предмет?')">×</button>
+                        </form>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="tooltip-container" id="tooltipContainer">
+                    <div class="tooltip-content">
+                        <span class="close-btn" onclick="closeTooltip()">&times;</span>
+                            <div class="details"></div>
+                                <div class="info-section"></div>
+                                <div class="pros" id="head_pros"><h3>Плюсы</h3>  </div>
+                                <div class="cons" id="head_cons"><h3>Минусы</h3> </div>
+                                <div class="stars"><h4>Рейтинг </h4></div>
+                    </div>
+                </div>
+            {% else %}
+                {% if is_owner %}
+                    <a href="{{ url_for('upload', item_type='naplech') }}" class="add-item">+</a>
+                {% else %}
+                    <div class="empty-slot" >Нет предмета</div>
+                {% endif %}
+            {% endif %}
+        </div>
+
+        <!-- Оружие 1 -->
+        <div class="inventory-cell sword1-cell"> 
+            <div class="cell-label">Оружие 1</div>
+            {% if inventory.sword1 %}
+                <div class="item-container" onclick="showTooltip()">
+                    <img src="{{ url_for('static', filename='uploads/' + inventory.sword1.image_path) }}" 
+                         alt="Оружие 1"
+                         data-description="{{ inventory.sword1.description }}"
+                         data-pros="{{ inventory.sword1.pros }}"
+                         data-cons="{{ inventory.sword1.cons }}"
+                         data-rating="{{ inventory.sword1.rating }}">
+                    
+                    {% if is_owner %}
+                    <div class="item-controls">
+                        <a href="{{ url_for('upload', item_type='sword1') }}" class="edit-btn" title="Редактировать">✏️</a>
+                        <form action="{{ url_for('delete_item', item_type='sword1') }}" method="POST" class="delete-form">
+                            <button type="submit" class="delete-btn" title="Удалить" onclick="return confirm('Удалить этот предмет?')">×</button>
+                        </form>
+                    </div>
+                    {% endif %}
+                    
+                </div>
+                <div class="tooltip-container" id="tooltipContainer">
+                    <div class="tooltip-content">
+                        <span class="close-btn" onclick="closeTooltip()">&times;</span>
+                            <div class="details"></div>
+                                <div class="info-section"></div>
+                                <div class="pros" id="head_pros"><h3>Плюсы</h3>  </div>
+                                <div class="cons" id="head_cons"><h3>Минусы</h3> </div>
+                                <div class="stars"><h4>Рейтинг </h4></div>
+                    </div>
+                </div>
+
+            {% else %}
+                {% if is_owner %}
+                    <a href="{{ url_for('upload', item_type='sword1') }}" class="add-item">+</a>
+                {% else %}
+                    <div class="empty-slot">Нет предмета</div>
                 {% endif %}
             {% endif %}
         </div>
@@ -77,7 +235,6 @@
                     </div>
                     {% endif %}
                     
-                    <div class="item-tooltip"></div>
                 </div>
                 <div class="tooltip-container" id="tooltipContainer">
                     <div class="tooltip-content">
@@ -93,6 +250,213 @@
             {% else %}
                 {% if is_owner %}
                     <a href="{{ url_for('upload', item_type='torso') }}" class="add-item">+</a>
+                {% else %}
+                    <div class="empty-slot">Нет предмета</div>
+                {% endif %}
+            {% endif %}
+        </div>
+        <!-- Нагрудник -->
+        <div class="inventory-cell ng-cell"> 
+            <div class="cell-label">Нагрудник</div>
+            {% if inventory.ng %}
+                <div class="item-container" onclick="showTooltip()">
+                    <img src="{{ url_for('static', filename='uploads/' + inventory.ng.image_path) }}" 
+                         alt="Нагрудник"
+                         data-description="{{ inventory.ng.description }}"
+                         data-pros="{{ inventory.ng.pros }}"
+                         data-cons="{{ inventory.ng.cons }}"
+                         data-rating="{{ inventory.ng.rating }}">
+                    
+                    {% if is_owner %}
+                    <div class="item-controls">
+                        <a href="{{ url_for('upload', item_type='ng') }}" class="edit-btn" title="Редактировать">✏️</a>
+                        <form action="{{ url_for('delete_item', item_type='ng') }}" method="POST" class="delete-form">
+                            <button type="submit" class="delete-btn" title="Удалить" onclick="return confirm('Удалить этот предмет?')">×</button>
+                        </form>
+                    </div>
+                    {% endif %}
+                    
+                </div>
+                <div class="tooltip-container" id="tooltipContainer">
+                    <div class="tooltip-content">
+                        <span class="close-btn" onclick="closeTooltip()">&times;</span>
+                            <div class="details"></div>
+                                <div class="info-section"></div>
+                                <div class="pros" id="head_pros"><h3>Плюсы</h3>  </div>
+                                <div class="cons" id="head_cons"><h3>Минусы</h3> </div>
+                                <div class="stars"><h4>Рейтинг </h4></div>
+                    </div>
+                </div>
+
+            {% else %}
+                {% if is_owner %}
+                    <a href="{{ url_for('upload', item_type='ng') }}" class="add-item">+</a>
+                {% else %}
+                    <div class="empty-slot">Нет предмета</div>
+                {% endif %}
+            {% endif %}
+        </div>
+
+         <!-- Брассары -->
+        <div class="inventory-cell brass-cell"> 
+            <div class="cell-label">Брассары</div>
+            {% if inventory.brass %}
+                <div class="item-container" onclick="showTooltip()">
+                    <img src="{{ url_for('static', filename='uploads/' + inventory.brass.image_path) }}" 
+                         alt="Брассары"
+                         data-description="{{ inventory.brass.description }}"
+                         data-pros="{{ inventory.brass.pros }}"
+                         data-cons="{{ inventory.brass.cons }}"
+                         data-rating="{{ inventory.brass.rating }}">
+                    
+                    {% if is_owner %}
+                    <div class="item-controls">
+                        <a href="{{ url_for('upload', item_type='brass') }}" class="edit-btn" title="Редактировать">✏️</a>
+                        <form action="{{ url_for('delete_item', item_type='brass') }}" method="POST" class="delete-form">
+                            <button type="submit" class="delete-btn" title="Удалить" onclick="return confirm('Удалить этот предмет?')">×</button>
+                        </form>
+                    </div>
+                    {% endif %}
+                    
+                </div>
+                <div class="tooltip-container" id="tooltipContainer">
+                    <div class="tooltip-content">
+                        <span class="close-btn" onclick="closeTooltip()">&times;</span>
+                            <div class="details"></div>
+                                <div class="info-section"></div>
+                                <div class="pros" id="head_pros"><h3>Плюсы</h3>  </div>
+                                <div class="cons" id="head_cons"><h3>Минусы</h3> </div>
+                                <div class="stars"><h4>Рейтинг </h4></div>
+                    </div>
+                </div>
+
+            {% else %}
+                {% if is_owner %}
+                    <a href="{{ url_for('upload', item_type='brass') }}" class="add-item">+</a>
+                {% else %}
+                    <div class="empty-slot">Нет предмета</div>
+                {% endif %}
+            {% endif %}
+        </div>
+       
+         <!-- Оружие 2 -->
+        <div class="inventory-cell sword2-cell"> 
+            <div class="cell-label">Оружие 2</div>
+            {% if inventory.sword2 %}
+                <div class="item-container" onclick="showTooltip()">
+                    <img src="{{ url_for('static', filename='uploads/' + inventory.sword2.image_path) }}" 
+                         alt="Оружие 2"
+                         data-description="{{ inventory.sword2.description }}"
+                         data-pros="{{ inventory.sword2.pros }}"
+                         data-cons="{{ inventory.sword2.cons }}"
+                         data-rating="{{ inventory.sword2.rating }}">
+                    
+                    {% if is_owner %}
+                    <div class="item-controls">
+                        <a href="{{ url_for('upload', item_type='sword2') }}" class="edit-btn" title="Редактировать">✏️</a>
+                        <form action="{{ url_for('delete_item', item_type='sword2') }}" method="POST" class="delete-form">
+                            <button type="submit" class="delete-btn" title="Удалить" onclick="return confirm('Удалить этот предмет?')">×</button>
+                        </form>
+                    </div>
+                    {% endif %}
+                    
+                </div>
+                <div class="tooltip-container" id="tooltipContainer">
+                    <div class="tooltip-content">
+                        <span class="close-btn" onclick="closeTooltip()">&times;</span>
+                            <div class="details"></div>
+                                <div class="info-section"></div>
+                                <div class="pros" id="head_pros"><h3>Плюсы</h3>  </div>
+                                <div class="cons" id="head_cons"><h3>Минусы</h3> </div>
+                                <div class="stars"><h4>Рейтинг </h4></div>
+                    </div>
+                </div>
+
+            {% else %}
+                {% if is_owner %}
+                    <a href="{{ url_for('upload', item_type='sword2') }}" class="add-item">+</a>
+                {% else %}
+                    <div class="empty-slot">Нет предмета</div>
+                {% endif %}
+            {% endif %}
+        </div>
+         <!-- Сумка -->
+        <div class="inventory-cell bag-cell"> 
+            <div class="cell-label">Сумка</div>
+            {% if inventory.bag %}
+                <div class="item-container" onclick="showTooltip()">
+                    <img src="{{ url_for('static', filename='uploads/' + inventory.bag.image_path) }}" 
+                         alt="Сумка"
+                         data-description="{{ inventory.bag.description }}"
+                         data-pros="{{ inventory.bag.pros }}"
+                         data-cons="{{ inventory.bag.cons }}"
+                         data-rating="{{ inventory.bag.rating }}">
+                    
+                    {% if is_owner %}
+                    <div class="item-controls">
+                        <a href="{{ url_for('upload', item_type='bag') }}" class="edit-btn" title="Редактировать">✏️</a>
+                        <form action="{{ url_for('delete_item', item_type='bag') }}" method="POST" class="delete-form">
+                            <button type="submit" class="delete-btn" title="Удалить" onclick="return confirm('Удалить этот предмет?')">×</button>
+                        </form>
+                    </div>
+                    {% endif %}
+                    
+                </div>
+                <div class="tooltip-container" id="tooltipContainer">
+                    <div class="tooltip-content">
+                        <span class="close-btn" onclick="closeTooltip()">&times;</span>
+                            <div class="details"></div>
+                                <div class="info-section"></div>
+                                <div class="pros" id="head_pros"><h3>Плюсы</h3>  </div>
+                                <div class="cons" id="head_cons"><h3>Минусы</h3> </div>
+                                <div class="stars"><h4>Рейтинг </h4></div>
+                    </div>
+                </div>
+
+            {% else %}
+                {% if is_owner %}
+                    <a href="{{ url_for('upload', item_type='bag') }}" class="add-item">+</a>
+                {% else %}
+                    <div class="empty-slot">Нет предмета</div>
+                {% endif %}
+            {% endif %}
+        </div>
+         <!-- Локти -->
+        <div class="inventory-cell lokti-cell"> 
+            <div class="cell-label">Локти</div>
+            {% if inventory.lokti %}
+                <div class="item-container" onclick="showTooltip()">
+                    <img src="{{ url_for('static', filename='uploads/' + inventory.lokti.image_path) }}" 
+                         alt="Локти"
+                         data-description="{{ inventory.lokti.description }}"
+                         data-pros="{{ inventory.lokti.pros }}"
+                         data-cons="{{ inventory.lokti.cons }}"
+                         data-rating="{{ inventory.lokti.rating }}">
+                    
+                    {% if is_owner %}
+                    <div class="item-controls">
+                        <a href="{{ url_for('upload', item_type='lokti') }}" class="edit-btn" title="Редактировать">✏️</a>
+                        <form action="{{ url_for('delete_item', item_type='lokti') }}" method="POST" class="delete-form">
+                            <button type="submit" class="delete-btn" title="Удалить" onclick="return confirm('Удалить этот предмет?')">×</button>
+                        </form>
+                    </div>
+                    {% endif %}
+                    
+                </div>
+                <div class="tooltip-container" id="tooltipContainer">
+                    <div class="tooltip-content">
+                        <span class="close-btn" onclick="closeTooltip()">&times;</span>
+                            <div class="details"></div>
+                                <div class="info-section"></div>
+                                <div class="pros" id="head_pros"><h3>Плюсы</h3>  </div>
+                                <div class="cons" id="head_cons"><h3>Минусы</h3> </div>
+                                <div class="stars"><h4>Рейтинг </h4></div>
+                    </div>
+                </div>
+
+            {% else %}
+                {% if is_owner %}
+                    <a href="{{ url_for('upload', item_type='lokti') }}" class="add-item">+</a>
                 {% else %}
                     <div class="empty-slot">Нет предмета</div>
                 {% endif %}
@@ -135,6 +499,47 @@
             {% else %}
                 {% if is_owner %}
                     <a href="{{ url_for('upload', item_type='gloves') }}" class="add-item">+</a>
+                {% else %}
+                    <div class="empty-slot">Нет предмета</div>
+                {% endif %}
+            {% endif %}
+        </div>
+         <!-- Оружие 3 -->
+        <div class="inventory-cell sword3-cell"> 
+            <div class="cell-label">Оружие 3</div>
+            {% if inventory.sword3 %}
+                <div class="item-container" onclick="showTooltip()">
+                    <img src="{{ url_for('static', filename='uploads/' + inventory.sword3.image_path) }}" 
+                         alt="Оружие 3"
+                         data-description="{{ inventory.sword3.description }}"
+                         data-pros="{{ inventory.sword3.pros }}"
+                         data-cons="{{ inventory.sword3.cons }}"
+                         data-rating="{{ inventory.sword3.rating }}">
+                    
+                    {% if is_owner %}
+                    <div class="item-controls">
+                        <a href="{{ url_for('upload', item_type='sword3') }}" class="edit-btn" title="Редактировать">✏️</a>
+                        <form action="{{ url_for('delete_item', item_type='sword3') }}" method="POST" class="delete-form">
+                            <button type="submit" class="delete-btn" title="Удалить" onclick="return confirm('Удалить этот предмет?')">×</button>
+                        </form>
+                    </div>
+                    {% endif %}
+                    
+                </div>
+                <div class="tooltip-container" id="tooltipContainer">
+                    <div class="tooltip-content">
+                        <span class="close-btn" onclick="closeTooltip()">&times;</span>
+                            <div class="details"></div>
+                                <div class="info-section"></div>
+                                <div class="pros" id="head_pros"><h3>Плюсы</h3>  </div>
+                                <div class="cons" id="head_cons"><h3>Минусы</h3> </div>
+                                <div class="stars"><h4>Рейтинг </h4></div>
+                    </div>
+                </div>
+
+            {% else %}
+                {% if is_owner %}
+                    <a href="{{ url_for('upload', item_type='sword3') }}" class="add-item">+</a>
                 {% else %}
                     <div class="empty-slot">Нет предмета</div>
                 {% endif %}

@@ -55,7 +55,34 @@ function showTooltip() {
                 handleCell(clickedCell);
             }else if (clickedCell.classList.contains('gloves-cell')) {
                 handleCell(clickedCell);
+            }else if (clickedCell.classList.contains('gorget-cell')) {
+                handleCell(clickedCell);
+            }else if (clickedCell.classList.contains('namasnik-cell')) {
+                handleCell(clickedCell);
+            }else if (clickedCell.classList.contains('naplech-cell')) {
+                handleCell(clickedCell);
+            }else if (clickedCell.classList.contains('sword1-cell')) {
+                handleCell(clickedCell);
+            }else if (clickedCell.classList.contains('ng-cell')) {
+                handleCell(clickedCell);
+            }else if (clickedCell.classList.contains('brass-cell')) {
+                handleCell(clickedCell);
+            }else if (clickedCell.classList.contains('bag-cell')) {
+                handleCell(clickedCell);
+            }else if (clickedCell.classList.contains('lokti-cell')) {
+                handleCell(clickedCell);
+            }else if (clickedCell.classList.contains('sword3-cell')) {
+                handleCell(clickedCell);
             }
+
+
+
+
+
+
+
+
+
 
         });
         

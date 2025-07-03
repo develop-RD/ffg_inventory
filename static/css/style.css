@@ -69,8 +69,8 @@ nav a {
 /* Сетка инвентаря */
 .inventory-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: repeat(3, 150px);
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(4, 150px);
     gap: 1rem;
 }
 
@@ -84,10 +84,19 @@ nav a {
     background-color: #f9f9f9;
 }
 
+.gorget-cell { grid-column: 1; grid-row: 1; }
+.namasnik-cell { grid-column: 3; grid-row: 1; }
 .head-cell { grid-column: 2; grid-row: 1; }
+.sword1-cell { grid-column: 1; grid-row: 2; }
 .torso-cell { grid-column: 2; grid-row: 2; }
-.gloves-cell { grid-column: 3; grid-row: 2; }
-.pants-cell { grid-column: 2; grid-row: 3; }
+.ng-cell { grid-column: 3; grid-row: 2; }
+.brass-cell { grid-column: 4; grid-row: 2; }
+.sword2-cell { grid-column: 1; grid-row: 3; }
+.bag-cell { grid-column: 2; grid-row: 3; }
+.pants-cell { grid-column: 3; grid-row: 3; }
+.lokti-cell { grid-column: 4; grid-row: 3; }
+.sword3-cell { grid-column: 1; grid-row: 4; }
+.gloves-cell { grid-column: 4; grid-row: 4; }
 
 .cell-label {
     position: absolute;
@@ -278,7 +287,7 @@ nav a {
 
 .user-list {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
     gap: 1rem;
     margin-top: 1rem;
 }
