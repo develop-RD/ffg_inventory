@@ -147,6 +147,7 @@ def view_profile(username):
         "sword1": next((i for i in items if i.item_type == "sword1"), None),
         "sword2": next((i for i in items if i.item_type == "sword2"), None),
         "sword3": next((i for i in items if i.item_type == "sword3"), None),
+        "sht": next((i for i in items if i.item_type == "sht"), None),
         "torso": next((i for i in items if i.item_type == "torso"), None),
         "ng": next((i for i in items if i.item_type == "ng"), None),
         "brass": next((i for i in items if i.item_type == "brass"), None),

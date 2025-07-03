@@ -73,17 +73,9 @@ function showTooltip() {
                 handleCell(clickedCell);
             }else if (clickedCell.classList.contains('sword3-cell')) {
                 handleCell(clickedCell);
+            }else if (clickedCell.classList.contains('sht-cell')) {
+                handleCell(clickedCell);
             }
-
-
-
-
-
-
-
-
-
-
         });
         
     

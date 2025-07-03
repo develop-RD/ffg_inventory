@@ -545,7 +545,47 @@
                 {% endif %}
             {% endif %}
         </div>
+         <!-- Штаны -->
+        <div class="inventory-cell sht-cell"> 
+            <div class="cell-label"> Штаны </div>
+            {% if inventory.sht %}
+                <div class="item-container" onclick="showTooltip()">
+                    <img src="{{ url_for('static', filename='uploads/' + inventory.sht.image_path) }}" 
+                         alt="Штаны"
+                         data-description="{{ inventory.sht.description }}"
+                         data-pros="{{ inventory.sht.pros }}"
+                         data-cons="{{ inventory.sht.cons }}"
+                         data-rating="{{ inventory.sht.rating }}">
+                    
+                    {% if is_owner %}
+                    <div class="item-controls">
+                        <a href="{{ url_for('upload', item_type='sht') }}" class="edit-btn" title="Редактировать">✏️</a>
+                        <form action="{{ url_for('delete_item', item_type='sht') }}" method="POST" class="delete-form">
+                            <button type="submit" class="delete-btn" title="Удалить" onclick="return confirm('Удалить этот предмет?')">×</button>
+                        </form>
+                    </div>
+                    {% endif %}
+                    
+                </div>
+                <div class="tooltip-container" id="tooltipContainer">
+                    <div class="tooltip-content">
+                        <span class="close-btn" onclick="closeTooltip()">&times;</span>
+                            <div class="details"></div>
+                                <div class="info-section"></div>
+                                <div class="pros" id="head_pros"><h3>Плюсы</h3>  </div>
+                                <div class="cons" id="head_cons"><h3>Минусы</h3> </div>
+                                <div class="stars"><h4>Рейтинг </h4></div>
+                    </div>
+                </div>
 
+            {% else %}
+                {% if is_owner %}
+                    <a href="{{ url_for('upload', item_type='sht') }}" class="add-item">+</a>
+                {% else %}
+                    <div class="empty-slot">Нет предмета</div>
+                {% endif %}
+            {% endif %}
+        </div>
         <!-- Ноги -->
         <div class="inventory-cell pants-cell">
             <div class="cell-label">Ноги</div>

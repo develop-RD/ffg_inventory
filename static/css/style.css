@@ -93,10 +93,11 @@ nav a {
 .brass-cell { grid-column: 4; grid-row: 2; }
 .sword2-cell { grid-column: 1; grid-row: 3; }
 .bag-cell { grid-column: 2; grid-row: 3; }
-.pants-cell { grid-column: 3; grid-row: 3; }
+.sht-cell { grid-column: 3; grid-row: 3; }
 .lokti-cell { grid-column: 4; grid-row: 3; }
 .sword3-cell { grid-column: 1; grid-row: 4; }
 .gloves-cell { grid-column: 4; grid-row: 4; }
+.pants-cell { grid-column: 3; grid-row: 4; }
 
 .cell-label {
     position: absolute;
