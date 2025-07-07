@@ -153,6 +153,7 @@ def view_profile(username):
         "brass": next((i for i in items if i.item_type == "brass"), None),
         "gloves": next((i for i in items if i.item_type == "gloves"), None),
         "pants": next((i for i in items if i.item_type == "pants"), None),
+        "shoes": next((i for i in items if i.item_type == "shoes"), None),
     }
 
     is_owner = current_user.is_authenticated and current_user.id == viewed_user.id

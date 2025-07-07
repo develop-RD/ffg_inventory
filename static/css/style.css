@@ -83,7 +83,7 @@ nav a {
     align-items: center;
     background-color: #f9f9f9;
 }
-
+/* Расстановка элементов по сетке */
 .gorget-cell { grid-column: 1; grid-row: 1; }
 .namasnik-cell { grid-column: 3; grid-row: 1; }
 .head-cell { grid-column: 2; grid-row: 1; }
@@ -97,11 +97,12 @@ nav a {
 .lokti-cell { grid-column: 4; grid-row: 3; }
 .sword3-cell { grid-column: 1; grid-row: 4; }
 .gloves-cell { grid-column: 4; grid-row: 4; }
+.shoes-cell { grid-column: 2; grid-row: 4; }
 .pants-cell { grid-column: 3; grid-row: 4; }
 
 .cell-label {
     position: absolute;
-    top: -25px;
+    top: -20px;
     left: 0;
     width: 100%;
     text-align: center;

@@ -55,8 +55,6 @@ function showTooltip() {
                 handleCell(clickedCell);
             }else if (clickedCell.classList.contains('gloves-cell')) {
                 handleCell(clickedCell);
-            }else if (clickedCell.classList.contains('gorget-cell')) {
-                handleCell(clickedCell);
             }else if (clickedCell.classList.contains('namasnik-cell')) {
                 handleCell(clickedCell);
             }else if (clickedCell.classList.contains('naplech-cell')) {
@@ -75,7 +73,10 @@ function showTooltip() {
                 handleCell(clickedCell);
             }else if (clickedCell.classList.contains('sht-cell')) {
                 handleCell(clickedCell);
+            }else if (clickedCell.classList.contains('shoes-cell')) {
+                handleCell(clickedCell);
             }
+
         });
         
     
