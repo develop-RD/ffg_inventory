@@ -9,12 +9,24 @@
         <div class="profile-nav">
         <a href="{{ url_for('user_list') }}" class="btn back-btn">← Все пользователи</a>
            </div>
+
     <div class="inventory-grid">
+             <div class="tooltip-container" id="tooltipContainer">
+                    <div class="tooltip-content">
+                        <span class="close-btn" onclick="closeTooltip()">&times;</span>
+                            <div class="details"></div>
+                                <div class="info-section"></div>
+                                <div class="pros" id="head_pros"><h3>Плюсы</h3>  </div>
+                                <div class="cons" id="head_cons"><h3>Минусы</h3> </div>
+                                <div class="stars"><h4>Рейтинг </h4></div>
+                    </div>
+             </div>
+
          <!-- Горжет -->
         <div class="inventory-cell gorget-cell">
             <div class="cell-label">Горжет</div>
             {% if inventory.gorget %}
-                <div class="item-container" onclick="showTooltip()">
+                <div class="item-container" >
                     <img src="{{ url_for('static', filename='uploads/' + inventory.gorget.image_path) }}" 
                         alt="Горжет"
                         data-description="{{ inventory.gorget.description }}"
@@ -31,17 +43,7 @@
                     </div>
                     {% endif %}
                 </div>
-                <div class="tooltip-container" id="tooltipContainer">
-                    <div class="tooltip-content">
-                        <span class="close-btn" onclick="closeTooltip()">&times;</span>
-                            <div class="details"></div>
-                                <div class="info-section"></div>
-                                <div class="pros" id="head_pros"><h3>Плюсы</h3>  </div>
-                                <div class="cons" id="head_cons"><h3>Минусы</h3> </div>
-                                <div class="stars"><h4>Рейтинг </h4></div>
-                    </div>
-                </div>
-            {% else %}
+                           {% else %}
                 {% if is_owner %}
                     <a href="{{ url_for('upload', item_type='gorget') }}" class="add-item">+</a>
                 {% else %}
@@ -53,7 +55,7 @@
         <div class="inventory-cell namasnik-cell">
             <div class="cell-label">Намасник</div>
             {% if inventory.namasnik %}
-                <div class="item-container" onclick="showTooltip()">
+                <div class="item-container"> 
                     <img src="{{ url_for('static', filename='uploads/' + inventory.namasnik.image_path) }}" 
                         alt="Намасник"
                         data-description="{{ inventory.namasnik.description }}"
@@ -70,17 +72,7 @@
                     </div>
                     {% endif %}
                 </div>
-                <div class="tooltip-container" id="tooltipContainer">
-                    <div class="tooltip-content">
-                        <span class="close-btn" onclick="closeTooltip()">&times;</span>
-                            <div class="details"></div>
-                                <div class="info-section"></div>
-                                <div class="pros" id="head_pros"><h3>Плюсы</h3>  </div>
-                                <div class="cons" id="head_cons"><h3>Минусы</h3> </div>
-                                <div class="stars"><h4>Рейтинг </h4></div>
-                    </div>
-                </div>
-            {% else %}
+                            {% else %}
                 {% if is_owner %}
                     <a href="{{ url_for('upload', item_type='namasnik') }}" class="add-item">+</a>
                 {% else %}
@@ -92,7 +84,7 @@
         <div class="inventory-cell head-cell">
             <div class="cell-label">Маска</div>
             {% if inventory.head %}
-                <div class="item-container" onclick="showTooltip()">
+                <div class="item-container"> 
                     <img src="{{ url_for('static', filename='uploads/' + inventory.head.image_path) }}" 
                         alt="Маска"
                         data-description="{{ inventory.head.description }}"
@@ -109,17 +101,7 @@
                     </div>
                     {% endif %}
                 </div>
-                <div class="tooltip-container" id="tooltipContainer">
-                    <div class="tooltip-content">
-                        <span class="close-btn" onclick="closeTooltip()">&times;</span>
-                            <div class="details"></div>
-                                <div class="info-section"></div>
-                                <div class="pros" id="head_pros"><h3>Плюсы</h3>  </div>
-                                <div class="cons" id="head_cons"><h3>Минусы</h3> </div>
-                                <div class="stars"><h4>Рейтинг </h4></div>
-                    </div>
-                </div>
-            {% else %}
+                            {% else %}
                 {% if is_owner %}
                     <a href="{{ url_for('upload', item_type='head') }}" class="add-item">+</a>
                 {% else %}
@@ -131,7 +113,7 @@
         <div class="inventory-cell naplech-cell">
             <div class="cell-label">Наплечники</div>
             {% if inventory.naplech %}
-                <div class="item-container" onclick="showTooltip()">
+                <div class="item-container"> 
                     <img src="{{ url_for('static', filename='uploads/' + inventory.naplech.image_path) }}" 
                         alt="Наплечники"
                         data-description="{{ inventory.naplech.description }}"
@@ -148,17 +130,7 @@
                     </div>
                     {% endif %}
                 </div>
-                <div class="tooltip-container" id="tooltipContainer">
-                    <div class="tooltip-content">
-                        <span class="close-btn" onclick="closeTooltip()">&times;</span>
-                            <div class="details"></div>
-                                <div class="info-section"></div>
-                                <div class="pros" id="head_pros"><h3>Плюсы</h3>  </div>
-                                <div class="cons" id="head_cons"><h3>Минусы</h3> </div>
-                                <div class="stars"><h4>Рейтинг </h4></div>
-                    </div>
-                </div>
-            {% else %}
+                           {% else %}
                 {% if is_owner %}
                     <a href="{{ url_for('upload', item_type='naplech') }}" class="add-item">+</a>
                 {% else %}
@@ -171,7 +143,7 @@
         <div class="inventory-cell sword1-cell"> 
             <div class="cell-label">Оружие 1</div>
             {% if inventory.sword1 %}
-                <div class="item-container" onclick="showTooltip()">
+                <div class="item-container"> 
                     <img src="{{ url_for('static', filename='uploads/' + inventory.sword1.image_path) }}" 
                          alt="Оружие 1"
                          data-description="{{ inventory.sword1.description }}"
@@ -189,16 +161,6 @@
                     {% endif %}
                     
                 </div>
-                <div class="tooltip-container" id="tooltipContainer">
-                    <div class="tooltip-content">
-                        <span class="close-btn" onclick="closeTooltip()">&times;</span>
-                            <div class="details"></div>
-                                <div class="info-section"></div>
-                                <div class="pros" id="head_pros"><h3>Плюсы</h3>  </div>
-                                <div class="cons" id="head_cons"><h3>Минусы</h3> </div>
-                                <div class="stars"><h4>Рейтинг </h4></div>
-                    </div>
-                </div>
 
             {% else %}
                 {% if is_owner %}
@@ -213,7 +175,7 @@
         <div class="inventory-cell torso-cell"> 
             <div class="cell-label">Куртка</div>
             {% if inventory.torso %}
-                <div class="item-container" onclick="showTooltip()">
+                <div class="item-container">
                     <img src="{{ url_for('static', filename='uploads/' + inventory.torso.image_path) }}" 
                          alt="Куртка"
                          data-description="{{ inventory.torso.description }}"
@@ -231,16 +193,6 @@
                     {% endif %}
                     
                 </div>
-                <div class="tooltip-container" id="tooltipContainer">
-                    <div class="tooltip-content">
-                        <span class="close-btn" onclick="closeTooltip()">&times;</span>
-                            <div class="details"></div>
-                                <div class="info-section"></div>
-                                <div class="pros" id="head_pros"><h3>Плюсы</h3>  </div>
-                                <div class="cons" id="head_cons"><h3>Минусы</h3> </div>
-                                <div class="stars"><h4>Рейтинг </h4></div>
-                    </div>
-                </div>
 
             {% else %}
                 {% if is_owner %}
@@ -254,7 +206,7 @@
         <div class="inventory-cell ng-cell"> 
             <div class="cell-label">Нагрудник</div>
             {% if inventory.ng %}
-                <div class="item-container" onclick="showTooltip()">
+                <div class="item-container"> 
                     <img src="{{ url_for('static', filename='uploads/' + inventory.ng.image_path) }}" 
                          alt="Нагрудник"
                          data-description="{{ inventory.ng.description }}"
@@ -272,16 +224,6 @@
                     {% endif %}
                     
                 </div>
-                <div class="tooltip-container" id="tooltipContainer">
-                    <div class="tooltip-content">
-                        <span class="close-btn" onclick="closeTooltip()">&times;</span>
-                            <div class="details"></div>
-                                <div class="info-section"></div>
-                                <div class="pros" id="head_pros"><h3>Плюсы</h3>  </div>
-                                <div class="cons" id="head_cons"><h3>Минусы</h3> </div>
-                                <div class="stars"><h4>Рейтинг </h4></div>
-                    </div>
-                </div>
 
             {% else %}
                 {% if is_owner %}
@@ -296,7 +238,7 @@
         <div class="inventory-cell brass-cell"> 
             <div class="cell-label">Брассары</div>
             {% if inventory.brass %}
-                <div class="item-container" onclick="showTooltip()">
+                <div class="item-container"> 
                     <img src="{{ url_for('static', filename='uploads/' + inventory.brass.image_path) }}" 
                          alt="Брассары"
                          data-description="{{ inventory.brass.description }}"
@@ -314,16 +256,6 @@
                     {% endif %}
                     
                 </div>
-                <div class="tooltip-container" id="tooltipContainer">
-                    <div class="tooltip-content">
-                        <span class="close-btn" onclick="closeTooltip()">&times;</span>
-                            <div class="details"></div>
-                                <div class="info-section"></div>
-                                <div class="pros" id="head_pros"><h3>Плюсы</h3>  </div>
-                                <div class="cons" id="head_cons"><h3>Минусы</h3> </div>
-                                <div class="stars"><h4>Рейтинг </h4></div>
-                    </div>
-                </div>
 
             {% else %}
                 {% if is_owner %}
@@ -338,7 +270,7 @@
         <div class="inventory-cell sword2-cell"> 
             <div class="cell-label">Оружие 2</div>
             {% if inventory.sword2 %}
-                <div class="item-container" onclick="showTooltip()">
+                <div class="item-container"> 
                     <img src="{{ url_for('static', filename='uploads/' + inventory.sword2.image_path) }}" 
                          alt="Оружие 2"
                          data-description="{{ inventory.sword2.description }}"
@@ -356,16 +288,6 @@
                     {% endif %}
                     
                 </div>
-                <div class="tooltip-container" id="tooltipContainer">
-                    <div class="tooltip-content">
-                        <span class="close-btn" onclick="closeTooltip()">&times;</span>
-                            <div class="details"></div>
-                                <div class="info-section"></div>
-                                <div class="pros" id="head_pros"><h3>Плюсы</h3>  </div>
-                                <div class="cons" id="head_cons"><h3>Минусы</h3> </div>
-                                <div class="stars"><h4>Рейтинг </h4></div>
-                    </div>
-                </div>
 
             {% else %}
                 {% if is_owner %}
@@ -379,7 +301,7 @@
         <div class="inventory-cell bag-cell"> 
             <div class="cell-label">Сумка</div>
             {% if inventory.bag %}
-                <div class="item-container" onclick="showTooltip()">
+                <div class="item-container"> 
                     <img src="{{ url_for('static', filename='uploads/' + inventory.bag.image_path) }}" 
                          alt="Сумка"
                          data-description="{{ inventory.bag.description }}"
@@ -397,16 +319,6 @@
                     {% endif %}
                     
                 </div>
-                <div class="tooltip-container" id="tooltipContainer">
-                    <div class="tooltip-content">
-                        <span class="close-btn" onclick="closeTooltip()">&times;</span>
-                            <div class="details"></div>
-                                <div class="info-section"></div>
-                                <div class="pros" id="head_pros"><h3>Плюсы</h3>  </div>
-                                <div class="cons" id="head_cons"><h3>Минусы</h3> </div>
-                                <div class="stars"><h4>Рейтинг </h4></div>
-                    </div>
-                </div>
 
             {% else %}
                 {% if is_owner %}
@@ -420,7 +332,7 @@
         <div class="inventory-cell lokti-cell"> 
             <div class="cell-label">Локти</div>
             {% if inventory.lokti %}
-                <div class="item-container" onclick="showTooltip()">
+                <div class="item-container"> 
                     <img src="{{ url_for('static', filename='uploads/' + inventory.lokti.image_path) }}" 
                          alt="Локти"
                          data-description="{{ inventory.lokti.description }}"
@@ -438,16 +350,6 @@
                     {% endif %}
                     
                 </div>
-                <div class="tooltip-container" id="tooltipContainer">
-                    <div class="tooltip-content">
-                        <span class="close-btn" onclick="closeTooltip()">&times;</span>
-                            <div class="details"></div>
-                                <div class="info-section"></div>
-                                <div class="pros" id="head_pros"><h3>Плюсы</h3>  </div>
-                                <div class="cons" id="head_cons"><h3>Минусы</h3> </div>
-                                <div class="stars"><h4>Рейтинг </h4></div>
-                    </div>
-                </div>
 
             {% else %}
                 {% if is_owner %}
@@ -462,7 +364,7 @@
         <div class="inventory-cell gloves-cell">
             <div class="cell-label">Руки</div>
             {% if inventory.gloves %}
-                <div class="item-container" onclick="showTooltip()">
+                <div class="item-container"> 
                     <img src="{{ url_for('static', filename='uploads/' + inventory.gloves.image_path) }}" 
                          alt="Перчатки"
                          data-description="{{ inventory.gloves.description }}"
@@ -480,16 +382,6 @@
                     {% endif %}
                     
                 </div>
-                <div class="tooltip-container" id="tooltipContainer">
-                    <div class="tooltip-content">
-                        <span class="close-btn" onclick="closeTooltip()">&times;</span>
-                            <div class="details"></div>
-                                <div class="info-section"></div>
-                                <div class="pros" id="head_pros"><h3>Плюсы</h3>  </div>
-                                <div class="cons" id="head_cons"><h3>Минусы</h3> </div>
-                                <div class="stars"><h4>Рейтинг </h4></div>
-                    </div>
-                </div>
 
             {% else %}
                 {% if is_owner %}
@@ -503,7 +395,7 @@
         <div class="inventory-cell sword3-cell"> 
             <div class="cell-label">Оружие 3</div>
             {% if inventory.sword3 %}
-                <div class="item-container" onclick="showTooltip()">
+                <div class="item-container">
                     <img src="{{ url_for('static', filename='uploads/' + inventory.sword3.image_path) }}" 
                          alt="Оружие 3"
                          data-description="{{ inventory.sword3.description }}"
@@ -521,16 +413,6 @@
                     {% endif %}
                     
                 </div>
-                <div class="tooltip-container" id="tooltipContainer">
-                    <div class="tooltip-content">
-                        <span class="close-btn" onclick="closeTooltip()">&times;</span>
-                            <div class="details"></div>
-                                <div class="info-section"></div>
-                                <div class="pros" id="head_pros"><h3>Плюсы</h3>  </div>
-                                <div class="cons" id="head_cons"><h3>Минусы</h3> </div>
-                                <div class="stars"><h4>Рейтинг </h4></div>
-                    </div>
-                </div>
 
             {% else %}
                 {% if is_owner %}
@@ -544,7 +426,7 @@
         <div class="inventory-cell sht-cell"> 
             <div class="cell-label"> Штаны </div>
             {% if inventory.sht %}
-                <div class="item-container" onclick="showTooltip()">
+                <div class="item-container"> 
                     <img src="{{ url_for('static', filename='uploads/' + inventory.sht.image_path) }}" 
                          alt="Штаны"
                          data-description="{{ inventory.sht.description }}"
@@ -562,16 +444,6 @@
                     {% endif %}
                     
                 </div>
-                <div class="tooltip-container" id="tooltipContainer">
-                    <div class="tooltip-content">
-                        <span class="close-btn" onclick="closeTooltip()">&times;</span>
-                            <div class="details"></div>
-                                <div class="info-section"></div>
-                                <div class="pros" id="head_pros"><h3>Плюсы</h3>  </div>
-                                <div class="cons" id="head_cons"><h3>Минусы</h3> </div>
-                                <div class="stars"><h4>Рейтинг </h4></div>
-                    </div>
-                </div>
 
             {% else %}
                 {% if is_owner %}
@@ -585,7 +457,7 @@
         <div class="inventory-cell shoes-cell"> 
             <div class="cell-label"> Обувь </div>
             {% if inventory.shoes %}
-                <div class="item-container" onclick="showTooltip()">
+                <div class="item-container">
                     <img src="{{ url_for('static', filename='uploads/' + inventory.shoes.image_path) }}" 
                          alt="Обувь"
                          data-description="{{ inventory.shoes.description }}"
@@ -603,16 +475,6 @@
                     {% endif %}
                     
                 </div>
-                <div class="tooltip-container" id="tooltipContainer">
-                    <div class="tooltip-content">
-                        <span class="close-btn" onclick="closeTooltip()">&times;</span>
-                            <div class="details"></div>
-                                <div class="info-section"></div>
-                                <div class="pros" id="head_pros"><h3>Плюсы</h3>  </div>
-                                <div class="cons" id="head_cons"><h3>Минусы</h3> </div>
-                                <div class="stars"><h4>Рейтинг </h4></div>
-                    </div>
-                </div>
 
             {% else %}
                 {% if is_owner %}
@@ -626,7 +488,7 @@
         <div class="inventory-cell pants-cell">
             <div class="cell-label">Ноги</div>
             {% if inventory.pants %}
-                <div class="item-container" onclick="showTooltip()">
+                <div class="item-container"> 
                     <img src="{{ url_for('static', filename='uploads/' + inventory.pants.image_path) }}" 
                          alt="Штаны"
                          data-description="{{ inventory.pants.description }}"
@@ -642,17 +504,7 @@
                         </form>
                     </div>
                     {% endif %}
-                 <div class="tooltip-container" id="tooltipContainer">
-                    <div class="tooltip-content">
-                        <span class="close-btn" onclick="closeTooltip()">&times;</span>
-                            <div class="details"></div>
-                                <div class="info-section">
-                                <div class="pros" id="head_pros"><h3>Плюсы</h3>  </div>
-                                <div class="cons" id="head_cons"><h3>Минусы</h3> </div>
-                                <div class="stars"><h4>Рейтинг </h4></div>
-                    </div>
                 </div>
-
             {% else %}
                 {% if is_owner %}
                     <a href="{{ url_for('upload', item_type='pants') }}" class="add-item">+</a>

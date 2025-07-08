@@ -32,56 +32,26 @@ function showTooltip() {
 //
 */
 
-function showTooltip() {
+let currentTooltipCell = null; // Запоминаем текущую ячейку
+function showTooltip(event) {
     console.log("opened");
-        
+           // Если тултип уже открыт для этой ячейки — закрываем его
+    if (currentTooltipCell === event.currentTarget) {
+        closeTooltip();
+        return;
+    } 
 
+   currentTooltipCell = event.currentTarget; 
+    // Останавливаем всплытие события, чтобы не сработал outsideClickListener
+    event.stopPropagation();
+        // Показываем тултип
+    const tooltip = document.getElementById('tooltipContainer');
+    tooltip.style.display = 'flex';
 
-     document.getElementById('tooltipContainer').style.display = 'flex';
-  // Инициализация подсказок
-    document.querySelectorAll('.inventory-cell').forEach(cell =>{ 
-    /*Создаём поля*/
-        cell.addEventListener('click',function(event){
-            // event.currentTarget - это элемент, на который кликнули
+    // Инициализация подсказок
             const clickedCell = event.currentTarget;
-            console.log('Clicked cell:', clickedCell);
-            
-            // Работаем только с этой ячейкой
-            if (clickedCell.classList.contains('head-cell')) {
-                handleCell(clickedCell);
-            } else if (clickedCell.classList.contains('pants-cell')) {
-                handleCell(clickedCell);
-            }else if (clickedCell.classList.contains('torso-cell')) {
-                handleCell(clickedCell);
-            }else if (clickedCell.classList.contains('gloves-cell')) {
-                handleCell(clickedCell);
-            }else if (clickedCell.classList.contains('namasnik-cell')) {
-                handleCell(clickedCell);
-            }else if (clickedCell.classList.contains('naplech-cell')) {
-                handleCell(clickedCell);
-            }else if (clickedCell.classList.contains('sword1-cell')) {
-                handleCell(clickedCell);
-            }else if (clickedCell.classList.contains('ng-cell')) {
-                handleCell(clickedCell);
-            }else if (clickedCell.classList.contains('brass-cell')) {
-                handleCell(clickedCell);
-            }else if (clickedCell.classList.contains('bag-cell')) {
-                handleCell(clickedCell);
-            }else if (clickedCell.classList.contains('lokti-cell')) {
-                handleCell(clickedCell);
-            }else if (clickedCell.classList.contains('sword3-cell')) {
-                handleCell(clickedCell);
-            }else if (clickedCell.classList.contains('sht-cell')) {
-                handleCell(clickedCell);
-            }else if (clickedCell.classList.contains('shoes-cell')) {
-                handleCell(clickedCell);
-            }
-
-        });
-        
-    
-    
-    });
+/* передаём на заполнение только нужную информацию об объекте */
+            handleCell(clickedCell.offsetParent);
 
 }
 
@@ -110,9 +80,11 @@ function handleCell(cell) {
 }
 
 function closeTooltip() {
+    console.log("closed");
+    isTooltipOpen = false;
     document.getElementById('tooltipContainer').style.display = 'none';
-   
 }
+
 
 
 function fillPros(desc,Pros,cons,rating) {
@@ -160,9 +132,11 @@ function fillPros(desc,Pros,cons,rating) {
 
 // Инициализация при загрузке страницы
 document.addEventListener('DOMContentLoaded', function() {
+    console.log("init");
     // Создаем ul элемент если его нет
     const prosDiv = document.querySelector('.pros');
     const consDiv = document.querySelector('.cons');
-
-   
+      document.querySelectorAll('.inventory-cell .item-container').forEach(item => {
+        item.addEventListener('click', showTooltip);
+    }); 
  });
