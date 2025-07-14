@@ -165,6 +165,30 @@ def view_profile(username):
 @app.route("/upload/<item_type>", methods=["GET", "POST"])
 @login_required
 def upload(item_type):
+    print("start item type\n")
+    # проверяем данные из БД
+
+    items = InventoryItem.query.filter_by(user_id=current_user.id).all()
+    print("current_user = ", current_user.id)
+    inventory = {
+        "gorget": next((i for i in items if i.item_type == "gorget"), None),
+        "lokti": next((i for i in items if i.item_type == "lokti"), None),
+        "bag": next((i for i in items if i.item_type == "bag"), None),
+        "namasnik": next((i for i in items if i.item_type == "namasnik"), None),
+        "head": next((i for i in items if i.item_type == "head"), None),
+        "naplech": next((i for i in items if i.item_type == "naplech"), None),
+        "sword1": next((i for i in items if i.item_type == "sword1"), None),
+        "sword2": next((i for i in items if i.item_type == "sword2"), None),
+        "sword3": next((i for i in items if i.item_type == "sword3"), None),
+        "sht": next((i for i in items if i.item_type == "sht"), None),
+        "torso": next((i for i in items if i.item_type == "torso"), None),
+        "ng": next((i for i in items if i.item_type == "ng"), None),
+        "brass": next((i for i in items if i.item_type == "brass"), None),
+        "gloves": next((i for i in items if i.item_type == "gloves"), None),
+        "pants": next((i for i in items if i.item_type == "pants"), None),
+        "shoes": next((i for i in items if i.item_type == "shoes"), None),
+    }
+    print(inventory)
     if request.method == "POST":
         file = request.files["image"]
         if file and allowed_file(file.filename):
@@ -177,6 +201,7 @@ def upload(item_type):
             item = InventoryItem.query.filter_by(
                 user_id=current_user.id, item_type=item_type
             ).first()
+            print("upper\n")
             if not item:
                 item = InventoryItem(
                     user_id=current_user.id,
@@ -205,7 +230,8 @@ def upload(item_type):
             db.session.commit()
             return redirect(url_for("my_profile"))
 
-    return render_template("upload.html", item_type=item_type)
+    return render_template("upload.html", item_type=item_type, inventory=inventory)
+    # return render_template("upload.html", item_type=item_type)
 
 
 @app.route("/delete/<item_type>", methods=["POST"])
