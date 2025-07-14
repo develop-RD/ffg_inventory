@@ -165,11 +165,9 @@ def view_profile(username):
 @app.route("/upload/<item_type>", methods=["GET", "POST"])
 @login_required
 def upload(item_type):
-    print("start item type\n")
     # проверяем данные из БД
 
     items = InventoryItem.query.filter_by(user_id=current_user.id).all()
-    print("current_user = ", current_user.id)
     inventory = {
         "gorget": next((i for i in items if i.item_type == "gorget"), None),
         "lokti": next((i for i in items if i.item_type == "lokti"), None),
@@ -188,7 +186,6 @@ def upload(item_type):
         "pants": next((i for i in items if i.item_type == "pants"), None),
         "shoes": next((i for i in items if i.item_type == "shoes"), None),
     }
-    print(inventory)
     if request.method == "POST":
         file = request.files["image"]
         if file and allowed_file(file.filename):
@@ -197,41 +194,37 @@ def upload(item_type):
             )
             filepath = os.path.join(app.config["UPLOAD_FOLDER"], filename)
             file.save(filepath)
+            print(filename)
 
-            item = InventoryItem.query.filter_by(
-                user_id=current_user.id, item_type=item_type
-            ).first()
-            print("upper\n")
-            if not item:
-                item = InventoryItem(
-                    user_id=current_user.id,
-                    item_type=item_type,
-                    image_path=filename,
-                    description=request.form["description"],
-                    pros=request.form["pros"],
-                    cons=request.form["cons"],
-                    rating=int(request.form["rating"]),
-                )
-                db.session.add(item)
-            else:
-                if item.image_path:
-                    old_file = os.path.join(
-                        app.config["UPLOAD_FOLDER"], item.image_path
-                    )
-                    # if os.path.exists(old_file):
-                    #    os.remove(old_file)
+        item = InventoryItem.query.filter_by(
+            user_id=current_user.id, item_type=item_type
+        ).first()
+        if not item:
+            item = InventoryItem(
+                user_id=current_user.id,
+                item_type=item_type,
+                image_path=filename,
+                description=request.form["description"],
+                pros=request.form["pros"],
+                cons=request.form["cons"],
+                rating=int(request.form["rating"]),
+            )
+            db.session.add(item)
+        else:
+            if item.image_path:
+                old_file = os.path.join(app.config["UPLOAD_FOLDER"], item.image_path)
+                # if os.path.exists(old_file):
+                #    os.remove(old_file)
+            item.image_path = item.image_path
+            item.description = request.form["description"]
+            item.pros = request.form["pros"]
+            item.cons = request.form["cons"]
+            item.rating = int(request.form["rating"])
 
-                item.image_path = filename
-                item.description = request.form["description"]
-                item.pros = request.form["pros"]
-                item.cons = request.form["cons"]
-                item.rating = int(request.form["rating"])
-
-            db.session.commit()
-            return redirect(url_for("my_profile"))
+        db.session.commit()
+        return redirect(url_for("my_profile"))
 
     return render_template("upload.html", item_type=item_type, inventory=inventory)
-    # return render_template("upload.html", item_type=item_type)
 
 
 @app.route("/delete/<item_type>", methods=["POST"])

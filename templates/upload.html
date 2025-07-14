@@ -1,38 +1,124 @@
 {% extends "base.html" %}
 
-{% block title %}Добавить предмет {% endblock %}
+{% block title %}Добавить предмет{% endblock %}
 
 {% block content %}
 <div class="upload-container">
-    <h1>Добавить предмет: {{ item_type }} </h1>
+    <h1>Добавить предмет: {{ item_type }}</h1>
     <form method="POST" enctype="multipart/form-data">
         <div class="form-group">
             <label for="image">Изображение:</label>
-            <input type="file" id="image" name="image" accept="image/*" required>
+            <input type="file" id="image" name="image" accept="image/*" onchange="previewNewImage(this)">
+            
+            <!-- Контейнер для превью -->
+            <div class="image-preview">
+                {% if inventory[item_type].image_path %}
+                    <img id="preview" src="{{ url_for('static', filename='uploads/' + inventory[item_type].image_path) }}" 
+                         alt="Текущее изображение">
+                {% else %}
+                    <img id="preview" src="" alt="Превью" style="display: none;">
+                {% endif %}
+            </div>
         </div>
-        
+
         <div class="form-group">
             <label for="description">Описание:</label>
-            <textarea id="description" name="description"equired> {{inventory[item_type].description}} </textarea>
+            <textarea id="description" name="description" required>{{ inventory[item_type].description }}</textarea>
         </div>
         
         <div class="form-group">
             <label for="pros">Плюсы:</label>
-            <textarea id="pros" name="pros" required> {{inventory[item_type].pros}}</textarea>
+            <textarea id="pros" name="pros" required>{{ inventory[item_type].pros }}</textarea>
         </div>
         
         <div class="form-group">
             <label for="cons">Минусы:</label>
-            <textarea id="cons" name="cons" required>{{inventory[item_type].cons}}</textarea>
+            <textarea id="cons" name="cons" required>{{ inventory[item_type].cons }}</textarea>
         </div>
         
         <div class="form-group">
             <label for="rating">Рейтинг (1-5):</label>
-            <input type="number" id="rating" name="rating" value={{inventory[item_type].rating}} min="1" max="5" required>
+            <input type="number" id="rating" name="rating" value="{{ inventory[item_type].rating }}" min="1" max="5" required>
         </div>
         
         <button type="submit" class="btn">Сохранить</button>
         <a href="{{ url_for('my_profile') }}" class="btn cancel">Отмена</a>
     </form>
 </div>
+
+<script>
+function previewNewImage(input) {
+    const preview = document.getElementById('preview');
+    const file = input.files[0];
+    
+    if (file) {
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+            preview.src = e.target.result;
+            preview.style.display = 'block';
+        }
+        
+        reader.readAsDataURL(file);
+    } else {
+        // Если пользователь отменил выбор, оставляем старое изображение
+        {% if inventory[item_type].image_path %}
+            preview.src = "{{ url_for('static', filename='uploads/' + inventory[item_type].image_path) }}";
+        {% else %}
+            preview.style.display = 'none';
+        {% endif %}
+    }
+}
+</script>
+
+<style>
+.upload-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.image-preview {
+    margin-top: 10px;
+}
+
+.image-preview img {
+    max-width: 200px;
+    max-height: 200px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 5px;
+}
+
+textarea, input[type="number"] {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+textarea {
+    height: 100px;
+    resize: vertical;
+}
+
+.btn {
+    padding: 10px 15px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-right: 10px;
+}
+
+.btn.cancel {
+    background-color: #f44336;
+}
+</style>
 {% endblock %}
