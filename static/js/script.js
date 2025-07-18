@@ -1,142 +1,28 @@
-/*document.addEventListener('DOMContentLoaded', function() {
-function showTooltip() {
-    console.log("opened");
-    // Инициализация подсказок
-    document.querySelectorAll('.inventory-cell').forEach(cell => {
+// Этот код уже встроен в profile.html, но если вы используете отдельный файл script.js, добавьте туда:
+
+function loadWeaponClass(weaponClass) {
+    const currentUrl = new URL(window.location.href);
+    currentUrl.searchParams.set('weapon_class', weaponClass);
+    window.location.href = currentUrl.toString();
+}
+
+function saveWeaponClass() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const weaponClass = urlParams.get('weapon_class');
     
-        //document.getElementById('tooltipContainer').style.display = 'flex';
-        const img = cell.querySelector('img');
-        const tooltip = cell.querySelector('.item-tooltip');
-        
-        if (img && tooltip) {
-            const description = img.getAttribute('data-description');
-            const pros = img.getAttribute('data-pros');
-            const cons = img.getAttribute('data-cons');
-            const rating = img.getAttribute('data-rating');
-            console.log(pros); 
-            let stars = '';
-            for (let i = 0; i < 5; i++) {
-                stars += i < rating ? '★' : '☆';
-            }
-            
-            tooltip.innerHTML = `
-                <p><strong>Описание:</strong> ${description}</p>
-                <p><strong>Плюсы:</strong> ${pros}</p>
-                <p><strong>Минусы:</strong> ${cons}</p>
-                <p><strong>Рейтинг:</strong> ${stars}</p>
-            `;
+    fetch("/set_weapon_class", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `weapon_class=${weaponClass}`
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            //alert('Класс оружия сохранен как основной');
+        } else {
+            alert('Ошибка при сохранении класса оружия');
         }
     });
-};
-//});
-//
-*/
-
-let currentTooltipCell = null; // Запоминаем текущую ячейку
-function showTooltip(event) {
-    console.log("opened");
-           // Если тултип уже открыт для этой ячейки — закрываем его
-    if (currentTooltipCell === event.currentTarget) {
-        closeTooltip();
-        return;
-    } 
-
-   currentTooltipCell = event.currentTarget; 
-    // Останавливаем всплытие события, чтобы не сработал outsideClickListener
-    event.stopPropagation();
-        // Показываем тултип
-    const tooltip = document.getElementById('tooltipContainer');
-    tooltip.style.display = 'flex';
-
-    // Инициализация подсказок
-            const clickedCell = event.currentTarget;
-/* передаём на заполнение только нужную информацию об объекте */
-            handleCell(clickedCell.offsetParent);
-
 }
-
-function handleCell(cell) {
-    // Логика только для *-cell
-    const prosDiv = document.querySelector('.pros');
-    const consDiv = document.querySelector('.cons');
-    if (prosDiv && !prosDiv.querySelector('ul')) {
-        const ul = document.createElement('ul');
-        prosDiv.appendChild(ul);
-    }
-    if (consDiv && !consDiv.querySelector('ul')) {
-        const li = document.createElement('ul');
-        consDiv.appendChild(li);
-    }
-
-        const img = cell.querySelector('img');
-
-       /* Вывод информации только для определённых объектов*/ 
-        const description = img.getAttribute('data-description');
-        const pros = img.getAttribute('data-pros');
-        const cons = img.getAttribute('data-cons');
-        const rating = img.getAttribute('data-rating');
-        fillPros(description,pros,cons,rating);
-
-}
-
-function closeTooltip() {
-    console.log("closed");
-    isTooltipOpen = false;
-    document.getElementById('tooltipContainer').style.display = 'none';
-}
-
-
-
-function fillPros(desc,Pros,cons,rating) {
-    const prosList = [Pros.split('\n')];
-    const consList = [cons.split('\n')];
-    const detContainer = document.querySelector('.details');
-    const prosContainer = document.querySelector('.pros');
-    const consContainer = document.querySelector('.cons');
-    const starsContainer = document.querySelector('.stars');
-    /*Очищаем перед отправкой*/
-    prosContainer.innerHTML = '<h3>Плюсы</h3>';
-    consContainer.innerHTML = '<h3>Минусы</h3>';
-    detContainer.innerHTML = `
-      <section>
-        <h3><strong>Описание</strong></h3>
-        <div>${desc}</div>
-      </section>
-    `;
-    let stars = '';
-    for (let i = 0; i < 5; i++) {
-        stars += i < rating ? '★' : '☆';
-    }
-    starsContainer.innerHTML = `
-      <section>
-        <h3><strong>Рейтинг</strong></h3>
-        <div>${stars}</div>
-      </section>
-    `;
-
-    /*Добавляем каждый пункт при выводе*/    
-    for (const elem of prosList[0]){
-        const li = document.createElement('li');
-        li.textContent = elem;
-        prosContainer.appendChild(li);
-    }
-
-    for (const elem of consList[0]){
-        const li = document.createElement('li');
-        li.textContent = elem;
-        consContainer.appendChild(li);
-    }
-
-    
-}
-
-// Инициализация при загрузке страницы
-document.addEventListener('DOMContentLoaded', function() {
-    console.log("init");
-    // Создаем ul элемент если его нет
-    const prosDiv = document.querySelector('.pros');
-    const consDiv = document.querySelector('.cons');
-      document.querySelectorAll('.inventory-cell .item-container').forEach(item => {
-        item.addEventListener('click', showTooltip);
-    }); 
- });

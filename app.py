@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, session, abort
+from flask import Flask, render_template, request, redirect, url_for, flash, session, abort, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, logout_user, current_user, login_required
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -8,9 +8,7 @@ import uuid
 
 
 app = Flask(__name__)
-app.config["SECRET_KEY"] = (
-    "2079acc5744b8f1fe9b9c84cb9a7a21ed531bbca08574b035a2bf52f4bf6cbe7"
-)
+app.config["SECRET_KEY"] = "2079acc5744b8f1fe9b9c84cb9a7a21ed531bbca08574b035a2bf52f4bf6cbe7"
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///inventory.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["UPLOAD_FOLDER"] = "static/uploads"
@@ -24,6 +22,7 @@ class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
     password = db.Column(db.String(120), nullable=False)
+    weapon_class = db.Column(db.String(20), default='sword_buckler')
     items = db.relationship(
         "InventoryItem", backref="user", lazy=True, cascade="all, delete-orphan"
     )
@@ -32,6 +31,7 @@ class User(db.Model, UserMixin):
 class InventoryItem(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    weapon_class = db.Column(db.String(20), default='all')  # 'all' или конкретный класс
     item_type = db.Column(db.String(20), nullable=False)
     image_path = db.Column(db.String(255))
     description = db.Column(db.Text)
@@ -46,10 +46,7 @@ def load_user(user_id):
 
 
 def allowed_file(filename):
-    return (
-        "." in filename
-        and filename.rsplit(".", 1)[1].lower() in app.config["ALLOWED_EXTENSIONS"]
-    )
+    return "." in filename and filename.rsplit(".", 1)[1].lower() in app.config["ALLOWED_EXTENSIONS"]
 
 
 @app.route("/users/search")
@@ -135,7 +132,12 @@ def my_profile():
 @app.route("/profile/<username>")
 def view_profile(username):
     viewed_user = User.query.filter_by(username=username).first_or_404()
-    items = InventoryItem.query.filter_by(user_id=viewed_user.id).all()
+    weapon_class = request.args.get('weapon_class', viewed_user.weapon_class)
+    
+    # Получаем предметы для текущего класса оружия и общие предметы
+    items = InventoryItem.query.filter_by(user_id=viewed_user.id).filter(
+        (InventoryItem.weapon_class == weapon_class) | (InventoryItem.weapon_class == 'all')
+    ).all()
 
     inventory = {
         "gorget": next((i for i in items if i.item_type == "gorget"), None),
@@ -158,16 +160,31 @@ def view_profile(username):
 
     is_owner = current_user.is_authenticated and current_user.id == viewed_user.id
     return render_template(
-        "profile.html", inventory=inventory, viewed_user=viewed_user, is_owner=is_owner
+        "profile.html", 
+        inventory=inventory, 
+        viewed_user=viewed_user, 
+        is_owner=is_owner,
+        current_weapon_class=weapon_class
     )
+
+
+@app.route("/set_weapon_class", methods=["POST"])
+@login_required
+def set_weapon_class():
+    weapon_class = request.form.get("weapon_class")
+    if weapon_class in ["sword_buckler", "longsword", "rapier_dagger", "sabre"]:
+        current_user.weapon_class = weapon_class
+        db.session.commit()
+        return jsonify({"status": "success"})
+    return jsonify({"status": "error", "message": "Invalid weapon class"})
 
 
 @app.route("/upload/<item_type>", methods=["GET", "POST"])
 @login_required
 def upload(item_type):
-    # проверяем данные из БД
-
-    items = InventoryItem.query.filter_by(user_id=current_user.id).all()
+    weapon_class = request.args.get('weapon_class', current_user.weapon_class)
+    
+    items = InventoryItem.query.filter_by(user_id=current_user.id, weapon_class=weapon_class).all()
     inventory = {
         "gorget": next((i for i in items if i.item_type == "gorget"), None),
         "lokti": next((i for i in items if i.item_type == "lokti"), None),
@@ -186,22 +203,27 @@ def upload(item_type):
         "pants": next((i for i in items if i.item_type == "pants"), None),
         "shoes": next((i for i in items if i.item_type == "shoes"), None),
     }
+
     if request.method == "POST":
         file = request.files["image"]
+        filename = None
+        
         if file and allowed_file(file.filename):
             filename = secure_filename(
-                f"{current_user.id}_{item_type}.{file.filename.rsplit('.', 1)[1].lower()}"
+                f"{current_user.id}_{weapon_class}_{item_type}.{file.filename.rsplit('.', 1)[1].lower()}"
             )
             filepath = os.path.join(app.config["UPLOAD_FOLDER"], filename)
             file.save(filepath)
-            print(filename)
 
         item = InventoryItem.query.filter_by(
-            user_id=current_user.id, item_type=item_type
+            user_id=current_user.id, 
+            item_type=item_type,
+            weapon_class=weapon_class
         ).first()
         if not item:
             item = InventoryItem(
                 user_id=current_user.id,
+                weapon_class=weapon_class,
                 item_type=item_type,
                 image_path=filename,
                 description=request.form["description"],
@@ -211,28 +233,39 @@ def upload(item_type):
             )
             db.session.add(item)
         else:
-            if item.image_path:
-                old_file = os.path.join(app.config["UPLOAD_FOLDER"], item.image_path)
-                # if os.path.exists(old_file):
-                #    os.remove(old_file)
-            item.image_path = item.image_path
+            if file and filename:
+                if item.image_path:
+                    old_file = os.path.join(app.config["UPLOAD_FOLDER"], item.image_path)
+                    #if os.path.exists(old_file):
+                    #    os.remove(old_file)
+                item.image_path = filename
             item.description = request.form["description"]
             item.pros = request.form["pros"]
             item.cons = request.form["cons"]
             item.rating = int(request.form["rating"])
 
         db.session.commit()
-        return redirect(url_for("my_profile"))
+        return redirect(url_for("view_profile", username=current_user.username, weapon_class=weapon_class))
 
-    return render_template("upload.html", item_type=item_type, inventory=inventory)
+    return render_template(
+        "upload.html", 
+        item_type=item_type, 
+        inventory=inventory,
+        weapon_class=weapon_class
+    )
 
 
 @app.route("/delete/<item_type>", methods=["POST"])
 @login_required
 def delete_item(item_type):
+    weapon_class = request.args.get('weapon_class', current_user.weapon_class)
+    
     item = InventoryItem.query.filter_by(
-        user_id=current_user.id, item_type=item_type
+        user_id=current_user.id, 
+        item_type=item_type,
+        weapon_class=weapon_class
     ).first()
+    
     if item:
         if item.image_path:
             file_path = os.path.join(app.config["UPLOAD_FOLDER"], item.image_path)
@@ -243,7 +276,7 @@ def delete_item(item_type):
         db.session.commit()
         flash("Предмет удален", "success")
 
-    return redirect(url_for("my_profile"))
+    return redirect(url_for("view_profile", username=current_user.username, weapon_class=weapon_class))
 
 
 if __name__ == "__main__":
