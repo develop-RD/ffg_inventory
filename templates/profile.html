@@ -3,12 +3,14 @@
 {% block title %}Профиль {{ viewed_user.username }}{% endblock %}
 
 {% block content %}
+
 <div class="profile-container">
     <h1>Профиль {{ viewed_user.username }}</h1>
     
     <div class="profile-nav">
         <a href="{{ url_for('user_list') }}" class="btn back-btn">← Все пользователи</a>
     </div>
+
 
     <!-- Добавляем кнопки выбора оружия -->
     <div class="weapon-selector">
@@ -58,7 +60,10 @@
             <div class="stars"><h4>Рейтинг</h4></div>
         </div>
     </div>
-
+    <!-- Новая структура с профилем по центру -->
+<div class="profile-layout">
+        <!-- Левая колонка инвентаря -->
+    <div class="inventory-column left-column">
     <div class="inventory-grid">
         <!-- Горжет -->
         <div class="inventory-cell gorget-cell" onclick="showTooltip(event)">
@@ -307,7 +312,45 @@
                 {% endif %}
             {% endif %}
         </div>
-       
+    </div>
+</div>
+<!--------- Конец левой части и начало центрального описания  -->
+ <!-- Центральная колонка с информацией о профиле -->
+        <div class="profile-info">
+            <h2>Информация о пользователе</h2>
+            
+            <div class="user-details">
+                <p><strong>Имя:</strong> {{ viewed_user.username }}</p>
+                <p><strong>Возраст:</strong> {{ viewed_user.age or "Не указан" }}</p>
+                
+                <h3>Владение оружием:</h3>
+                <ul class="weapon-skills">
+                    {% for weapon in weapon_data %}
+                    <li>
+                        {{ weapon.name }}: 
+                        {% if weapon.has %}
+                            {% if weapon.experience is not none %}
+                                {{ weapon.experience }} лет опыта
+                            {% else %}
+                                Опыт не указан
+                            {% endif %}
+                        {% else %}
+                            Нет
+                        {% endif %}
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            
+            {% if is_owner %}
+            <button onclick="window.location.href='{{ url_for('edit_profile') }}'" class="edit-profile-btn">
+                Редактировать профиль
+            </button>
+            {% endif %}
+        </div>
+<!-- Правая колонка инвентаря -->
+        <div class="inventory-column right-column">
+            <div class="inventory-grid">
         <!-- Оружие 2 -->
         <div class="inventory-cell sword2-cell" onclick="showTooltip(event)"> 
             <div class="cell-label">Оружие 2</div>
@@ -555,6 +598,9 @@
                 {% endif %}
             {% endif %}
         </div>
+    </div>
+    <!--som -->
+    </div>
     </div>
 </div>
 

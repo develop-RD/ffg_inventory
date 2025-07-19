@@ -5,7 +5,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 import os
 import uuid
-
+from datetime import datetime, date  # Добавьте в начало файла
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "2079acc5744b8f1fe9b9c84cb9a7a21ed531bbca08574b035a2bf52f4bf6cbe7"
@@ -23,6 +23,16 @@ class User(db.Model, UserMixin):
     username = db.Column(db.String(80), unique=True, nullable=False)
     password = db.Column(db.String(120), nullable=False)
     weapon_class = db.Column(db.String(20), default='sword_buckler')
+    age = db.Column(db.Integer)
+    # Оружие и стаж
+    has_longsword = db.Column(db.Boolean, default=False)
+    longsword_since = db.Column(db.Date)
+    has_rapier = db.Column(db.Boolean, default=False)
+    rapier_since = db.Column(db.Date)
+    has_sabre = db.Column(db.Boolean, default=False)
+    sabre_since = db.Column(db.Date)
+    has_sword_buckler = db.Column(db.Boolean, default=False)
+    sword_buckler_since = db.Column(db.Date)
     items = db.relationship(
         "InventoryItem", backref="user", lazy=True, cascade="all, delete-orphan"
     )
@@ -129,6 +139,42 @@ def my_profile():
     return redirect(url_for("view_profile", username=current_user.username))
 
 
+
+@app.route("/edit_profile", methods=["GET", "POST"])
+@login_required
+def edit_profile():
+    weapon_data = [
+        {'name': 'Длинный меч', 'field': 'longsword', 'has': current_user.has_longsword, 'since': current_user.longsword_since},
+        {'name': 'Рапира', 'field': 'rapier', 'has': current_user.has_rapier, 'since': current_user.rapier_since},
+        {'name': 'Сабля', 'field': 'sabre', 'has': current_user.has_sabre, 'since': current_user.sabre_since},
+        {'name': 'Меч и баклер', 'field': 'sword_buckler', 'has': current_user.has_sword_buckler, 'since': current_user.sword_buckler_since}
+    ]
+
+    if request.method == "POST":
+        current_user.age = request.form.get("age") or None
+        
+        for weapon in weapon_data:
+            has_field = f"has_{weapon['field']}"
+            since_field = f"{weapon['field']}_since"
+            
+            has_weapon = request.form.get(has_field) == 'on'
+            setattr(current_user, has_field, has_weapon)
+            
+            if has_weapon:
+                since_date = request.form.get(since_field)
+                if since_date:
+                    setattr(current_user, since_field, datetime.strptime(since_date, '%Y-%m-%d').date())
+                else:
+                    setattr(current_user, since_field, None)
+            else:
+                setattr(current_user, since_field, None)
+        
+        db.session.commit()
+        flash("Профиль успешно обновлен", "success")
+        return redirect(url_for("view_profile", username=current_user.username))
+    
+    return render_template("edit_profile.html", weapon_data=weapon_data)
+
 @app.route("/profile/<username>")
 def view_profile(username):
     viewed_user = User.query.filter_by(username=username).first_or_404()
@@ -138,6 +184,13 @@ def view_profile(username):
     items = InventoryItem.query.filter_by(user_id=viewed_user.id).filter(
         (InventoryItem.weapon_class == weapon_class) | (InventoryItem.weapon_class == 'all')
     ).all()
+    # Подготавливаем данные об оружии для шаблона
+    weapon_data = [
+        {'name': 'Длинный меч', 'field': 'longsword', 'has': viewed_user.has_longsword, 'since': viewed_user.longsword_since},
+        {'name': 'Рапира', 'field': 'rapier', 'has': viewed_user.has_rapier, 'since': viewed_user.rapier_since},
+        {'name': 'Сабля', 'field': 'sabre', 'has': viewed_user.has_sabre, 'since': viewed_user.sabre_since},
+        {'name': 'Меч и баклер', 'field': 'sword_buckler', 'has': viewed_user.has_sword_buckler, 'since': viewed_user.sword_buckler_since}
+    ]
 
     inventory = {
         "gorget": next((i for i in items if i.item_type == "gorget"), None),
@@ -160,13 +213,14 @@ def view_profile(username):
 
     is_owner = current_user.is_authenticated and current_user.id == viewed_user.id
     return render_template(
-        "profile.html", 
-        inventory=inventory, 
-        viewed_user=viewed_user, 
-        is_owner=is_owner,
-        current_weapon_class=weapon_class
-    )
-
+    "profile.html", 
+    inventory=inventory, 
+    viewed_user=viewed_user, 
+    is_owner=is_owner,
+    current_weapon_class=weapon_class,
+    weapon_data=weapon_data,
+    datetime=datetime  # передаем модуль datetime для вычисления стажа
+    ) 
 
 @app.route("/set_weapon_class", methods=["POST"])
 @login_required

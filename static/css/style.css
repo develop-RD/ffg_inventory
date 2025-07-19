@@ -43,6 +43,8 @@ nav a {
     color: #721c24;
 }
 
+
+
 /* Стили профиля */
 .profile-container {
     max-width: 900px;
@@ -66,14 +68,97 @@ nav a {
     border-radius: 4px;
 }
 
+
+.profile-layout {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr;
+    gap: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.profile-info {
+    grid-column: 2;
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.inventory-left {
+    grid-column: 1;
+}
+
+.inventory-right {
+    grid-column: 3;
+}
+
+
 /* Сетка инвентаря */
 .inventory-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    grid-template-rows: repeat(4, 150px);
+    grid-template-columns: 1fr;
     gap: 1rem;
 }
 
+/* Обновленные позиции элементов */
+.gorget-cell { grid-row: 1; }
+.namasnik-cell { grid-row: 2; }
+.head-cell { grid-row: 3; }
+.naplech-cell { grid-row: 4; }
+.sword1-cell { grid-row: 5; }
+.torso-cell { grid-row: 6; }
+.ng-cell { grid-row: 7; }
+.brass-cell { grid-row: 8; }
+
+/* Правая колонка */
+.sword2-cell { grid-row: 1; }
+.bag-cell { grid-row: 2; }
+.lokti-cell { grid-row: 3; }
+.gloves-cell { grid-row: 4; }
+.sword3-cell { grid-row: 5; }
+.sht-cell { grid-row: 6; }
+.shoes-cell { grid-row: 7; }
+.pants-cell { grid-row: 8; }
+
+.profile-info {
+    padding: 20px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.user-details {
+    margin-top: 20px;
+}
+
+.user-details p {
+    margin: 10px 0;
+}
+
+.weapon-skills {
+    list-style-type: none;
+    padding: 0;
+}
+
+.weapon-skills li {
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.edit-profile-btn {
+    margin-top: 20px;
+    padding: 10px 15px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.edit-profile-btn:hover {
+    background-color: #45a049;
+}
 .inventory-cell {
     position: relative;
     border: 2px dashed #ccc;
@@ -83,22 +168,6 @@ nav a {
     align-items: center;
     background-color: #f9f9f9;
 }
-/* Расстановка элементов по сетке */
-.gorget-cell { grid-column: 1; grid-row: 1; }
-.namasnik-cell { grid-column: 3; grid-row: 1; }
-.head-cell { grid-column: 2; grid-row: 1; }
-.sword1-cell { grid-column: 1; grid-row: 2; }
-.torso-cell { grid-column: 2; grid-row: 2; }
-.ng-cell { grid-column: 3; grid-row: 2; }
-.brass-cell { grid-column: 4; grid-row: 2; }
-.sword2-cell { grid-column: 1; grid-row: 3; }
-.bag-cell { grid-column: 2; grid-row: 3; }
-.sht-cell { grid-column: 3; grid-row: 3; }
-.lokti-cell { grid-column: 4; grid-row: 3; }
-.sword3-cell { grid-column: 1; grid-row: 4; }
-.gloves-cell { grid-column: 4; grid-row: 4; }
-.shoes-cell { grid-column: 2; grid-row: 4; }
-.pants-cell { grid-column: 3; grid-row: 4; }
 
 .cell-label {
     position: absolute;
