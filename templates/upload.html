@@ -1,100 +1,203 @@
 {% extends "base.html" %}
 
-{% block title %}Добавить предмет{% endblock %}
+{% block title %}{% if item %}Редактирование{% else %}Добавление{% endif %} {{ item_type }}{% endblock %}
 
 {% block content %}
 <div class="upload-container">
-    <h1>Добавить предмет: {{ item_type }}</h1>
-    <form method="POST" enctype="multipart/form-data">
+    <h1>{% if item %}Редактирование{% else %}Добавление{% endif %} {{ item_type }}</h1>
+    {% if weapon_class %}<h3>Класс оружия: {{ weapon_class }}</h3>{% endif %}
+    
+    <form method="POST" enctype="multipart/form-data" id="uploadForm">
+        <!-- Блок текущих изображений (только при редактировании) -->
+        {% if item and item.image_paths %}
         <div class="form-group">
-            <label for="image">Изображение:</label>
-            <input type="file" id="image" name="image" accept="image/*" onchange="previewNewImage(this)">
-            
-            <!-- Контейнер для превью -->
-            <div class="image-preview">
-                {% if inventory[item_type].image_path %}
-                    <img id="preview" src="{{ url_for('static', filename='uploads/' + inventory[item_type].image_path) }}" 
-                         alt="Текущее изображение">
-                {% else %}
-                    <img id="preview" src="" alt="Превью" style="display: none;">
-                {% endif %}
+            <label>Текущие изображения (отметьте для удаления):</label>
+            <div class="current-images">
+                {% for image_path in item.image_paths.split(',') %}
+                <div class="image-item">
+                    <img src="{{ url_for('static', filename='uploads/' + image_path) }}" 
+                         alt="Изображение {{ loop.index }}">
+                    <label class="delete-checkbox">
+                        <input type="checkbox" name="delete_images" value="{{ image_path }}">
+                        <span class="delete-icon">🗑️</span>
+                    </label>
+                </div>
+                {% endfor %}
             </div>
         </div>
+        {% endif %}
 
+        <!-- Блок загрузки новых изображений -->
+        <div class="form-group">
+            <label for="images">
+                {% if item %}Добавить новые изображения{% else %}Загрузите изображения{% endif %}
+                (можно выбрать несколько):
+            </label>
+            <input type="file" id="images" name="images" accept="image/*" multiple
+                   onchange="previewImages(this)">
+            
+            <div class="images-preview" id="imagesPreview"></div>
+            <div class="hint">Максимум 5 изображений ({% if item %}новые + текущие{% endif %})</div>
+        </div>
+
+        <!-- Остальные поля формы -->
         <div class="form-group">
             <label for="description">Описание:</label>
-            <textarea id="description" name="description" required>{{ inventory[item_type].description }}</textarea>
+            <textarea id="description" name="description" required>{{ item.description if item else '' }}</textarea>
         </div>
         
         <div class="form-group">
             <label for="pros">Плюсы:</label>
-            <textarea id="pros" name="pros" required>{{ inventory[item_type].pros }}</textarea>
+            <textarea id="pros" name="pros" required>{{ item.pros if item else '' }}</textarea>
         </div>
         
         <div class="form-group">
             <label for="cons">Минусы:</label>
-            <textarea id="cons" name="cons" required>{{ inventory[item_type].cons }}</textarea>
+            <textarea id="cons" name="cons" required>{{ item.cons if item else '' }}</textarea>
         </div>
         
         <div class="form-group">
             <label for="rating">Рейтинг (1-5):</label>
-            <input type="number" id="rating" name="rating" value="{{ inventory[item_type].rating }}" min="1" max="5" required>
+            <input type="number" id="rating" name="rating" 
+                   value="{{ item.rating if item else 3 }}" 
+                   min="1" max="5" required>
         </div>
         
-        <button type="submit" class="btn">Сохранить</button>
-        <a href="{{ url_for('my_profile') }}" class="btn cancel">Отмена</a>
+        <input type="hidden" name="weapon_class" value="{{ weapon_class }}">
+        
+        <div class="form-actions">
+            <button type="submit" class="btn">Сохранить</button>
+            <a href="{{ url_for('view_profile', username=current_user.username, weapon_class=weapon_class) }}" 
+               class="btn cancel">Отмена</a>
+        </div>
     </form>
 </div>
 
 <script>
-function previewNewImage(input) {
-    const preview = document.getElementById('preview');
-    const file = input.files[0];
+function previewImages(input) {
+    const previewContainer = document.getElementById('imagesPreview');
+    previewContainer.innerHTML = '';
     
-    if (file) {
-        const reader = new FileReader();
-        
-        reader.onload = function(e) {
-            preview.src = e.target.result;
-            preview.style.display = 'block';
-        }
-        
-        reader.readAsDataURL(file);
-    } else {
-        // Если пользователь отменил выбор, оставляем старое изображение
-        {% if inventory[item_type].image_path %}
-            preview.src = "{{ url_for('static', filename='uploads/' + inventory[item_type].image_path) }}";
-        {% else %}
-            preview.style.display = 'none';
-        {% endif %}
+    const files = Array.from(input.files);
+    const maxTotalImages = 5;
+    const currentImagesCount = {% if item and item.image_paths %}{{ item.image_paths.split(',')|length }}{% else %}0{% endif %};
+    const remainingSlots = maxTotalImages - currentImagesCount;
+    
+    if (files.length > remainingSlots) {
+        alert(`Можно добавить не более ${remainingSlots} изображений (всего не более 5)`);
+        input.value = '';
+        return;
     }
+
+    files.slice(0, remainingSlots).forEach((file, index) => {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const previewItem = document.createElement('div');
+            previewItem.className = 'preview-item';
+            
+            const img = document.createElement('img');
+            img.src = e.target.result;
+            img.alt = 'Превью ' + (index + 1);
+            
+            previewItem.appendChild(img);
+            previewContainer.appendChild(previewItem);
+        }
+        reader.readAsDataURL(file);
+    });
 }
 </script>
 
 <style>
 .upload-container {
-    max-width: 600px;
+    max-width: 800px;
     margin: 0 auto;
     padding: 20px;
 }
 
+.current-images {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin: 10px 0;
+}
+
+.image-item {
+    position: relative;
+    width: 150px;
+    transition: transform 0.2s;
+}
+
+.image-item:hover {
+    transform: scale(1.05);
+}
+
+.image-item img {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.delete-checkbox {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    cursor: pointer;
+}
+
+.delete-checkbox input {
+    display: none;
+}
+
+.delete-icon {
+    display: inline-block;
+    background: rgba(255, 0, 0, 0.7);
+    color: white;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 24px;
+    font-size: 14px;
+}
+
+.delete-checkbox input:checked + .delete-icon {
+    background: #f44336;
+    box-shadow: 0 0 0 2px white;
+}
+
+.images-preview {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.preview-item {
+    width: 150px;
+}
+
+.preview-item img {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.hint {
+    font-size: 12px;
+    color: #666;
+    margin-top: 5px;
+}
+
+/* Остальные стили */
 .form-group {
     margin-bottom: 20px;
 }
 
-.image-preview {
-    margin-top: 10px;
-}
-
-.image-preview img {
-    max-width: 200px;
-    max-height: 200px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    padding: 5px;
-}
-
-textarea, input[type="number"] {
+textarea, input[type="number"], input[type="file"] {
     width: 100%;
     padding: 8px;
     border: 1px solid #ddd;
@@ -107,18 +210,39 @@ textarea {
     resize: vertical;
 }
 
+.form-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
 .btn {
-    padding: 10px 15px;
-    background-color: #4CAF50;
-    color: white;
+    padding: 10px 20px;
     border: none;
     border-radius: 4px;
     cursor: pointer;
-    margin-right: 10px;
+    text-align: center;
+    text-decoration: none;
+    font-size: 14px;
 }
 
-.btn.cancel {
+.btn:hover {
+    opacity: 0.9;
+}
+
+.save-btn {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.delete-btn {
     background-color: #f44336;
+    color: white;
+}
+
+.cancel {
+    background-color: #757575;
+    color: white;
 }
 </style>
 {% endblock %}

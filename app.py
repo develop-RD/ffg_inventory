@@ -33,7 +33,7 @@ class InventoryItem(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     weapon_class = db.Column(db.String(20), default='all')  # 'all' или конкретный класс
     item_type = db.Column(db.String(20), nullable=False)
-    image_path = db.Column(db.String(255))
+    image_paths = db.Column(db.Text)
     description = db.Column(db.Text)
     pros = db.Column(db.Text)
     cons = db.Column(db.Text)
@@ -179,103 +179,105 @@ def set_weapon_class():
     return jsonify({"status": "error", "message": "Invalid weapon class"})
 
 
+
+# Обработчик загрузки/редактирования
+# Обработчик загрузки/редактирования
 @app.route("/upload/<item_type>", methods=["GET", "POST"])
 @login_required
 def upload(item_type):
     weapon_class = request.args.get('weapon_class', current_user.weapon_class)
-    
-    items = InventoryItem.query.filter_by(user_id=current_user.id, weapon_class=weapon_class).all()
-    inventory = {
-        "gorget": next((i for i in items if i.item_type == "gorget"), None),
-        "lokti": next((i for i in items if i.item_type == "lokti"), None),
-        "bag": next((i for i in items if i.item_type == "bag"), None),
-        "namasnik": next((i for i in items if i.item_type == "namasnik"), None),
-        "head": next((i for i in items if i.item_type == "head"), None),
-        "naplech": next((i for i in items if i.item_type == "naplech"), None),
-        "sword1": next((i for i in items if i.item_type == "sword1"), None),
-        "sword2": next((i for i in items if i.item_type == "sword2"), None),
-        "sword3": next((i for i in items if i.item_type == "sword3"), None),
-        "sht": next((i for i in items if i.item_type == "sht"), None),
-        "torso": next((i for i in items if i.item_type == "torso"), None),
-        "ng": next((i for i in items if i.item_type == "ng"), None),
-        "brass": next((i for i in items if i.item_type == "brass"), None),
-        "gloves": next((i for i in items if i.item_type == "gloves"), None),
-        "pants": next((i for i in items if i.item_type == "pants"), None),
-        "shoes": next((i for i in items if i.item_type == "shoes"), None),
-    }
+    item = InventoryItem.query.filter_by(
+        user_id=current_user.id,
+        item_type=item_type,
+        weapon_class=weapon_class
+    ).first()
 
     if request.method == "POST":
-        file = request.files["image"]
-        filename = None
+        # Обработка изображений
+        image_paths = []
         
-        if file and allowed_file(file.filename):
-            filename = secure_filename(
-                f"{current_user.id}_{weapon_class}_{item_type}.{file.filename.rsplit('.', 1)[1].lower()}"
-            )
-            filepath = os.path.join(app.config["UPLOAD_FOLDER"], filename)
-            file.save(filepath)
+        # Если редактирование - обрабатываем удаление
+        if item and item.image_paths:
+            current_images = item.image_paths.split(',')
+            delete_images = request.form.getlist('delete_images')
+            
+            # Удаляем отмеченные файлы
+            for img in delete_images:
+                try:
+                    os.remove(os.path.join(app.config['UPLOAD_FOLDER'], img))
+                except OSError:
+                    pass
+            
+            # Оставляем неотмеченные
+            image_paths = [img for img in current_images if img not in delete_images]
 
-        item = InventoryItem.query.filter_by(
-            user_id=current_user.id, 
-            item_type=item_type,
-            weapon_class=weapon_class
-        ).first()
+        # Обрабатываем новые изображения
+        files = request.files.getlist('images')
+        for i, file in enumerate(files):
+            if len(image_paths) >= 5:
+                break
+                
+            if file and file.filename and allowed_file(file.filename):
+                filename = secure_filename(
+                    f"{current_user.id}_{weapon_class}_{item_type}_{len(image_paths)}.{file.filename.rsplit('.', 1)[1].lower()}"
+                )
+                filepath = os.path.join(app.config["UPLOAD_FOLDER"], filename)
+                file.save(filepath)
+                image_paths.append(filename)
+
+        # Создаем или обновляем запись
         if not item:
             item = InventoryItem(
                 user_id=current_user.id,
                 weapon_class=weapon_class,
                 item_type=item_type,
-                image_path=filename,
-                description=request.form["description"],
-                pros=request.form["pros"],
-                cons=request.form["cons"],
-                rating=int(request.form["rating"]),
+                image_paths=",".join(image_paths),
+                description=request.form.get("description", ""),
+                pros=request.form.get("pros", ""),
+                cons=request.form.get("cons", ""),
+                rating=int(request.form.get("rating", 3)),
             )
             db.session.add(item)
         else:
-            if file and filename:
-                if item.image_path:
-                    old_file = os.path.join(app.config["UPLOAD_FOLDER"], item.image_path)
-                    #if os.path.exists(old_file):
-                    #    os.remove(old_file)
-                item.image_path = filename
-            item.description = request.form["description"]
-            item.pros = request.form["pros"]
-            item.cons = request.form["cons"]
-            item.rating = int(request.form["rating"])
+            item.image_paths = ",".join(image_paths) if image_paths else ""
+            item.description = request.form.get("description", "")
+            item.pros = request.form.get("pros", "")
+            item.cons = request.form.get("cons", "")
+            item.rating = int(request.form.get("rating", 3))
 
         db.session.commit()
         return redirect(url_for("view_profile", username=current_user.username, weapon_class=weapon_class))
 
     return render_template(
-        "upload.html", 
-        item_type=item_type, 
-        inventory=inventory,
-        weapon_class=weapon_class
+        "upload.html",
+        item_type=item_type,
+        weapon_class=weapon_class,
+        item=item
     )
 
-
+# Обработчик удаления предмета
 @app.route("/delete/<item_type>", methods=["POST"])
 @login_required
 def delete_item(item_type):
     weapon_class = request.args.get('weapon_class', current_user.weapon_class)
-    
     item = InventoryItem.query.filter_by(
-        user_id=current_user.id, 
+        user_id=current_user.id,
         item_type=item_type,
         weapon_class=weapon_class
-    ).first()
-    
-    if item:
-        if item.image_path:
-            file_path = os.path.join(app.config["UPLOAD_FOLDER"], item.image_path)
-            if os.path.exists(file_path):
-                os.remove(file_path)
+    ).first_or_404()
 
-        db.session.delete(item)
-        db.session.commit()
-        flash("Предмет удален", "success")
+    # Удаляем все изображения
+    if item.image_paths:
+        for image_path in item.image_paths.split(','):
+            try:
+                os.remove(os.path.join(app.config['UPLOAD_FOLDER'], image_path))
+            except OSError:
+                pass
 
+    # Удаляем запись из БД
+    db.session.delete(item)
+    db.session.commit()
+    flash("Предмет удален", "success")
     return redirect(url_for("view_profile", username=current_user.username, weapon_class=weapon_class))
 
 
