@@ -397,4 +397,4 @@ if __name__ == "__main__":
         db.create_all()
         if not os.path.exists(app.config["UPLOAD_FOLDER"]):
             os.makedirs(app.config["UPLOAD_FOLDER"])
-    app.run(debug=True)
+    app.run(host="192.168.0.108", port=8088, debug=False)
