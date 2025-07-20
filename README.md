@@ -1,2 +1,6 @@
-flask_sqlalchemy
-flask_login
+Сайт сделан для работы с heme инвенатрём
+Возможности:
+1. Регистрация
+2. Вход
+3. Выбор класса из 4 возможных:
+<img width="922" height="692" alt="Выбор класса" src="https://github.com/user-attachments/assets/73168f39-480d-4877-9630-fc15e73f3536" />
