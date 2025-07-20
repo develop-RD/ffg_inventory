@@ -102,24 +102,23 @@ nav a {
 }
 
 /* Обновленные позиции элементов */
-.gorget-cell { grid-row: 1; }
+.head-cell { grid-row: 1; }
 .namasnik-cell { grid-row: 2; }
-.head-cell { grid-row: 3; }
-.naplech-cell { grid-row: 4; }
-.sword1-cell { grid-row: 5; }
-.torso-cell { grid-row: 6; }
-.ng-cell { grid-row: 7; }
-.brass-cell { grid-row: 8; }
-
+.gorget-cell { grid-row: 3; }
+.ng-cell { grid-row: 4; }
+.torso-cell { grid-row: 5; }
+.pants-cell { grid-row: 6; }
+.sht-cell { grid-row: 7; }
+.sword1-cell { grid-row: 8; }
 /* Правая колонка */
-.sword2-cell { grid-row: 1; }
-.bag-cell { grid-row: 2; }
+.naplech-cell { grid-row: 1; }
+.brass-cell { grid-row: 2; }
 .lokti-cell { grid-row: 3; }
 .gloves-cell { grid-row: 4; }
-.sword3-cell { grid-row: 5; }
-.sht-cell { grid-row: 6; }
-.shoes-cell { grid-row: 7; }
-.pants-cell { grid-row: 8; }
+.bag-cell { grid-row: 5; }
+.shoes-cell { grid-row: 6; }
+.sword2-cell { grid-row: 7; }
+.sword3-cell { grid-row: 8; }
 
 .profile-info {
     padding: 20px;

@@ -168,37 +168,7 @@
             {% endif %}
         </div>
         
-        <!-- Наплечники -->
-        <div class="inventory-cell naplech-cell" onclick="showTooltip(event)">
-            <div class="cell-label">Наплечники</div>
-            {% if inventory.naplech %}
-                <div class="item-container"> 
-					<img src="{{ url_for('static', filename='uploads/' + inventory.naplech.image_paths.split(',')[0]) if inventory.naplech.image_paths else '' }}"  
-                        alt="Наплечники"
-                        data-description="{{ inventory.naplech.description }}"
-                        data-pros="{{ inventory.naplech.pros }}"
-                        data-cons="{{ inventory.naplech.cons }}"
-                        data-rating="{{ inventory.naplech.rating }}"
-						data-images="{{ inventory.naplech.image_paths if inventory.naplech.image_paths else '' }}">
-                    
-                    {% if is_owner %}
-                    <div class="item-controls">
-                        <a href="{{ url_for('upload', item_type='naplech', weapon_class=current_weapon_class) }}" class="edit-btn" title="Редактировать">✏️</a>
-                        <form action="{{ url_for('delete_item', item_type='naplech', weapon_class=current_weapon_class) }}" method="POST" class="delete-form">
-                            <button type="submit" class="delete-btn" title="Удалить" onclick="return confirm('Удалить этот предмет?')">×</button>
-                        </form>
-                    </div>
-                    {% endif %}
-                </div>
-            {% else %}
-                {% if is_owner %}
-                    <a href="{{ url_for('upload', item_type='naplech', weapon_class=current_weapon_class) }}" class="add-item">+</a>
-                {% else %}
-                    <div class="empty-slot">Нет предмета</div>
-                {% endif %}
-            {% endif %}
-        </div>
-
+        
         <!-- Оружие 1 -->
         <div class="inventory-cell sword1-cell" onclick="showTooltip(event)"> 
             <div class="cell-label">Оружие 1</div>
@@ -291,24 +261,23 @@
                 {% endif %}
             {% endif %}
         </div>
-
-        <!-- Брассары -->
-        <div class="inventory-cell brass-cell" onclick="showTooltip(event)"> 
-            <div class="cell-label">Брассары</div>
-            {% if inventory.brass %}
+        <!-- Штаны -->
+        <div class="inventory-cell sht-cell" onclick="showTooltip(event)"> 
+            <div class="cell-label">Штаны</div>
+            {% if inventory.sht %}
                 <div class="item-container">
-					<img src="{{ url_for('static', filename='uploads/' + inventory.brass.image_paths.split(',')[0]) if inventory.brass.image_paths else '' }}"
-                         alt="Брассары"
-                         data-description="{{ inventory.brass.description }}"
-                         data-pros="{{ inventory.brass.pros }}"
-                         data-cons="{{ inventory.brass.cons }}"
-                         data-rating="{{ inventory.brass.rating }}"
-						 data-images="{{ inventory.brass.image_paths if inventory.brass.image_paths else '' }}">
+					<img src="{{ url_for('static', filename='uploads/' + inventory.sht.image_paths.split(',')[0]) if inventory.sht.image_paths else '' }}"
+                         alt="Штаны"
+                         data-description="{{ inventory.sht.description }}"
+                         data-pros="{{ inventory.sht.pros }}"
+                         data-cons="{{ inventory.sht.cons }}"
+                         data-rating="{{ inventory.sht.rating }}"
+						 data-images="{{ inventory.sht.image_paths if inventory.sht.image_paths else '' }}">
                     
                     {% if is_owner %}
                     <div class="item-controls">
-                        <a href="{{ url_for('upload', item_type='brass', weapon_class=current_weapon_class) }}" class="edit-btn" title="Редактировать">✏️</a>
-                        <form action="{{ url_for('delete_item', item_type='brass', weapon_class=current_weapon_class) }}" method="POST" class="delete-form">
+                        <a href="{{ url_for('upload', item_type='sht', weapon_class=current_weapon_class) }}" class="edit-btn" title="Редактировать">✏️</a>
+                        <form action="{{ url_for('delete_item', item_type='sht', weapon_class=current_weapon_class) }}" method="POST" class="delete-form">
                             <button type="submit" class="delete-btn" title="Удалить" onclick="return confirm('Удалить этот предмет?')">×</button>
                         </form>
                     </div>
@@ -316,12 +285,43 @@
                 </div>
             {% else %}
                 {% if is_owner %}
-                    <a href="{{ url_for('upload', item_type='brass', weapon_class=current_weapon_class) }}" class="add-item">+</a>
+                    <a href="{{ url_for('upload', item_type='sht', weapon_class=current_weapon_class) }}" class="add-item">+</a>
                 {% else %}
                     <div class="empty-slot">Нет предмета</div>
                 {% endif %}
             {% endif %}
         </div>
+        <!-- Ноги -->
+        <div class="inventory-cell pants-cell" onclick="showTooltip(event)">
+            <div class="cell-label">Ноги</div>
+            {% if inventory.pants %}
+                <div class="item-container">
+					<img src="{{ url_for('static', filename='uploads/' + inventory.pants.image_paths.split(',')[0]) if inventory.pants.image_paths else '' }}"
+                         alt="Штаны"
+                         data-description="{{ inventory.pants.description }}"
+                         data-pros="{{ inventory.pants.pros }}"
+                         data-cons="{{ inventory.pants.cons }}"
+                         data-rating="{{ inventory.pants.rating }}"
+						 data-images="{{ inventory.pants.image_paths if inventory.pants.image_paths else '' }}">
+                    
+                    {% if is_owner %}
+                    <div class="item-controls">
+                        <a href="{{ url_for('upload', item_type='pants', weapon_class=current_weapon_class) }}" class="edit-btn" title="Редактировать">✏️</a>
+                        <form action="{{ url_for('delete_item', item_type='pants', weapon_class=current_weapon_class) }}" method="POST" class="delete-form">
+                            <button type="submit" class="delete-btn" title="Удалить" onclick="return confirm('Удалить этот предмет?')">×</button>
+                        </form>
+                    </div>
+                    {% endif %}
+                </div>
+            {% else %}
+                {% if is_owner %}
+                    <a href="{{ url_for('upload', item_type='pants', weapon_class=current_weapon_class) }}" class="add-item">+</a>
+                {% else %}
+                    <div class="empty-slot">Нет предмета</div>
+                {% endif %}
+            {% endif %}
+        </div>
+<!-- конец расположения элементов -->
     </div>
 </div>
 <!--------- Конец левой части и начало центрального описания  -->
@@ -368,6 +368,67 @@
 <!-- Правая колонка инвентаря -->
         <div class="inventory-column right-column">
             <div class="inventory-grid">
+        <!-- Наплечники -->
+        <div class="inventory-cell naplech-cell" onclick="showTooltip(event)">
+            <div class="cell-label">Наплечники</div>
+            {% if inventory.naplech %}
+                <div class="item-container"> 
+					<img src="{{ url_for('static', filename='uploads/' + inventory.naplech.image_paths.split(',')[0]) if inventory.naplech.image_paths else '' }}"  
+                        alt="Наплечники"
+                        data-description="{{ inventory.naplech.description }}"
+                        data-pros="{{ inventory.naplech.pros }}"
+                        data-cons="{{ inventory.naplech.cons }}"
+                        data-rating="{{ inventory.naplech.rating }}"
+						data-images="{{ inventory.naplech.image_paths if inventory.naplech.image_paths else '' }}">
+                    
+                    {% if is_owner %}
+                    <div class="item-controls">
+                        <a href="{{ url_for('upload', item_type='naplech', weapon_class=current_weapon_class) }}" class="edit-btn" title="Редактировать">✏️</a>
+                        <form action="{{ url_for('delete_item', item_type='naplech', weapon_class=current_weapon_class) }}" method="POST" class="delete-form">
+                            <button type="submit" class="delete-btn" title="Удалить" onclick="return confirm('Удалить этот предмет?')">×</button>
+                        </form>
+                    </div>
+                    {% endif %}
+                </div>
+            {% else %}
+                {% if is_owner %}
+                    <a href="{{ url_for('upload', item_type='naplech', weapon_class=current_weapon_class) }}" class="add-item">+</a>
+                {% else %}
+                    <div class="empty-slot">Нет предмета</div>
+                {% endif %}
+            {% endif %}
+        </div>
+        <!-- Брассары -->
+        <div class="inventory-cell brass-cell" onclick="showTooltip(event)"> 
+            <div class="cell-label">Брассары</div>
+            {% if inventory.brass %}
+                <div class="item-container">
+					<img src="{{ url_for('static', filename='uploads/' + inventory.brass.image_paths.split(',')[0]) if inventory.brass.image_paths else '' }}"
+                         alt="Брассары"
+                         data-description="{{ inventory.brass.description }}"
+                         data-pros="{{ inventory.brass.pros }}"
+                         data-cons="{{ inventory.brass.cons }}"
+                         data-rating="{{ inventory.brass.rating }}"
+						 data-images="{{ inventory.brass.image_paths if inventory.brass.image_paths else '' }}">
+                    
+                    {% if is_owner %}
+                    <div class="item-controls">
+                        <a href="{{ url_for('upload', item_type='brass', weapon_class=current_weapon_class) }}" class="edit-btn" title="Редактировать">✏️</a>
+                        <form action="{{ url_for('delete_item', item_type='brass', weapon_class=current_weapon_class) }}" method="POST" class="delete-form">
+                            <button type="submit" class="delete-btn" title="Удалить" onclick="return confirm('Удалить этот предмет?')">×</button>
+                        </form>
+                    </div>
+                    {% endif %}
+                </div>
+            {% else %}
+                {% if is_owner %}
+                    <a href="{{ url_for('upload', item_type='brass', weapon_class=current_weapon_class) }}" class="add-item">+</a>
+                {% else %}
+                    <div class="empty-slot">Нет предмета</div>
+                {% endif %}
+            {% endif %}
+        </div>
+
         <!-- Оружие 2 -->
         <div class="inventory-cell sword2-cell" onclick="showTooltip(event)"> 
             <div class="cell-label">Оружие 2</div>
@@ -523,37 +584,7 @@
             {% endif %}
         </div>
         
-        <!-- Штаны -->
-        <div class="inventory-cell sht-cell" onclick="showTooltip(event)"> 
-            <div class="cell-label">Штаны</div>
-            {% if inventory.sht %}
-                <div class="item-container">
-					<img src="{{ url_for('static', filename='uploads/' + inventory.sht.image_paths.split(',')[0]) if inventory.sht.image_paths else '' }}"
-                         alt="Штаны"
-                         data-description="{{ inventory.sht.description }}"
-                         data-pros="{{ inventory.sht.pros }}"
-                         data-cons="{{ inventory.sht.cons }}"
-                         data-rating="{{ inventory.sht.rating }}"
-						 data-images="{{ inventory.sht.image_paths if inventory.sht.image_paths else '' }}">
-                    
-                    {% if is_owner %}
-                    <div class="item-controls">
-                        <a href="{{ url_for('upload', item_type='sht', weapon_class=current_weapon_class) }}" class="edit-btn" title="Редактировать">✏️</a>
-                        <form action="{{ url_for('delete_item', item_type='sht', weapon_class=current_weapon_class) }}" method="POST" class="delete-form">
-                            <button type="submit" class="delete-btn" title="Удалить" onclick="return confirm('Удалить этот предмет?')">×</button>
-                        </form>
-                    </div>
-                    {% endif %}
-                </div>
-            {% else %}
-                {% if is_owner %}
-                    <a href="{{ url_for('upload', item_type='sht', weapon_class=current_weapon_class) }}" class="add-item">+</a>
-                {% else %}
-                    <div class="empty-slot">Нет предмета</div>
-                {% endif %}
-            {% endif %}
-        </div>
-        
+                
         <!-- Обувь -->
         <div class="inventory-cell shoes-cell" onclick="showTooltip(event)"> 
             <div class="cell-label">Обувь</div>
@@ -585,36 +616,6 @@
             {% endif %}
         </div>
         
-        <!-- Ноги -->
-        <div class="inventory-cell pants-cell" onclick="showTooltip(event)">
-            <div class="cell-label">Ноги</div>
-            {% if inventory.pants %}
-                <div class="item-container">
-					<img src="{{ url_for('static', filename='uploads/' + inventory.pants.image_paths.split(',')[0]) if inventory.pants.image_paths else '' }}"
-                         alt="Штаны"
-                         data-description="{{ inventory.pants.description }}"
-                         data-pros="{{ inventory.pants.pros }}"
-                         data-cons="{{ inventory.pants.cons }}"
-                         data-rating="{{ inventory.pants.rating }}"
-						 data-images="{{ inventory.pants.image_paths if inventory.pants.image_paths else '' }}">
-                    
-                    {% if is_owner %}
-                    <div class="item-controls">
-                        <a href="{{ url_for('upload', item_type='pants', weapon_class=current_weapon_class) }}" class="edit-btn" title="Редактировать">✏️</a>
-                        <form action="{{ url_for('delete_item', item_type='pants', weapon_class=current_weapon_class) }}" method="POST" class="delete-form">
-                            <button type="submit" class="delete-btn" title="Удалить" onclick="return confirm('Удалить этот предмет?')">×</button>
-                        </form>
-                    </div>
-                    {% endif %}
-                </div>
-            {% else %}
-                {% if is_owner %}
-                    <a href="{{ url_for('upload', item_type='pants', weapon_class=current_weapon_class) }}" class="add-item">+</a>
-                {% else %}
-                    <div class="empty-slot">Нет предмета</div>
-                {% endif %}
-            {% endif %}
-        </div>
     </div>
     <!--som -->
     </div>
