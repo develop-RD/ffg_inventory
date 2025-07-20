@@ -3,6 +3,16 @@
 {% block title %}Профиль {{ viewed_user.username }}{% endblock %}
 
 {% block content %}
+<!-- Добавляем фильтр pluralize для правильного склонения -->
+{% macro pluralize(number, singular, plural1, plural2) %}
+    {% if number % 10 == 1 and number % 100 != 11 %}
+        {{ singular }}
+    {% elif 2 <= number % 10 <= 4 and (number % 100 < 10 or number % 100 >= 20) %}
+        {{ plural1 }}
+    {% else %}
+        {{ plural2 }}
+    {% endif %}
+{% endmacro %}
 
 <div class="profile-container">
     <h1>Профиль {{ viewed_user.username }}</h1>
@@ -318,25 +328,32 @@
  <!-- Центральная колонка с информацией о профиле -->
         <div class="profile-info">
             <h2>Информация о пользователе</h2>
-            
+            <div class="user-header">
+                <h2>{% if viewed_user.real_name %}{{ viewed_user.real_name }}{% else %}{{ viewed_user.username }}{% endif %}</h2>
+                <p class="username">@{{ viewed_user.username }}</p>
+            </div> 
             <div class="user-details">
-                <p><strong>Имя:</strong> {{ viewed_user.username }}</p>
                 <p><strong>Возраст:</strong> {{ viewed_user.age or "Не указан" }}</p>
-                
+            
                 <h3>Владение оружием:</h3>
                 <ul class="weapon-skills">
                     {% for weapon in weapon_data %}
-                    <li>
-                        {{ weapon.name }}: 
-                        {% if weapon.has %}
-                            {% if weapon.experience is not none %}
-                                {{ weapon.experience }} лет опыта
+                    <li class="weapon-item">
+                        <span class="weapon-name">{{ weapon.name }}:</span>
+                        <span class="weapon-status">
+                            {% if weapon.has %}
+                                {% if weapon.experience %}
+                                    <span class="experience">
+                                        {{ weapon.experience.years }} {{ pluralize(weapon.experience.years, 'год', 'года', 'лет') }} 
+                                        и {{ weapon.experience.months }} {{ pluralize(weapon.experience.months, 'месяц', 'месяца', 'месяцев') }}
+                                    </span>
+                                {% else %}
+                                    <span class="no-date">(дата не указана)</span>
+                                {% endif %}
                             {% else %}
-                                Опыт не указан
+                                <span class="no-experience">Нет</span>
                             {% endif %}
-                        {% else %}
-                            Нет
-                        {% endif %}
+                        </span>
                     </li>
                     {% endfor %}
                 </ul>
@@ -603,6 +620,8 @@
     </div>
     </div>
 </div>
+
+
 
 <script>
 let currentGalleryImages = [];
@@ -888,6 +907,104 @@ document.addEventListener('DOMContentLoaded', function() {
 
 .save-weapon-btn:hover {
     background-color: #0b7dda;
+}
+
+// настройки вывода информации о профиле
+.profile-info {
+    background: white;
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.user-header {
+    margin-bottom: 20px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 15px;
+}
+
+.user-header h2 {
+    margin: 0;
+    font-size: 24px;
+}
+
+.username {
+    color: #666;
+    margin: 5px 0 0;
+    font-size: 16px;
+}
+
+.user-details {
+    margin-top: 15px;
+}
+
+.detail-item {
+    display: flex;
+    margin-bottom: 10px;
+}
+
+.detail-label {
+    font-weight: bold;
+    width: 100px;
+    color: #555;
+}
+
+.detail-value {
+    flex-grow: 1;
+}
+
+.weapon-skills {
+    list-style: none;
+    padding: 0;
+    margin: 15px 0 0;
+}
+
+.weapon-item {
+    padding: 8px 0;
+    border-bottom: 1px solid #f0f0f0;
+    display: flex;
+}
+
+.weapon-name {
+    font-weight: bold;
+    width: 150px;
+}
+
+.weapon-status {
+    flex-grow: 1;
+}
+
+.experience {
+    color: #2a7f2a;
+}
+
+.no-experience {
+    color: #999;
+    font-style: italic;
+}
+
+.no-date {
+    color: #d67a1f;
+}
+
+.profile-actions {
+    margin-top: 25px;
+    text-align: center;
+}
+
+.edit-profile-btn {
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
+
+.edit-profile-btn:hover {
+    background-color: #3e8e41;
 }
 </style>
 {% endblock %}
