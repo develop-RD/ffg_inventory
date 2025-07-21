@@ -5,11 +5,14 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 import os
 import uuid
-from datetime import datetime, date 
-# для указания стажа 
+from datetime import datetime, date
+# для указания стажа
 from dateutil.relativedelta import relativedelta
+
 app = Flask(__name__)
-app.config["SECRET_KEY"] = "2079acc5744b8f1fe9b9c84cb9a7a21ed531bbca08574b035a2bf52f4bf6cbe7"
+app.config["SECRET_KEY"] = (
+    "2079acc5744b8f1fe9b9c84cb9a7a21ed531bbca08574b035a2bf52f4bf6cbe7"
+)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///inventory.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["UPLOAD_FOLDER"] = "static/uploads"
@@ -23,7 +26,7 @@ class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
     password = db.Column(db.String(120), nullable=False)
-    weapon_class = db.Column(db.String(20), default='sword_buckler')
+    weapon_class = db.Column(db.String(20), default="sword_buckler")
     age = db.Column(db.Integer)
     real_name = db.Column(db.String(100))
     # Оружие и стаж
@@ -43,7 +46,9 @@ class User(db.Model, UserMixin):
 class InventoryItem(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
-    weapon_class = db.Column(db.String(20), default='all')  # 'all' или конкретный класс
+    model = db.Column(db.String(20), default="none")  # изготовитель
+    model_site = db.Column(db.Text)  # ссылка на изготовителя
+    weapon_class = db.Column(db.String(20), default="all")  # 'all' или конкретный класс
     item_type = db.Column(db.String(20), nullable=False)
     image_paths = db.Column(db.Text)
     description = db.Column(db.Text)
@@ -58,7 +63,10 @@ def load_user(user_id):
 
 
 def allowed_file(filename):
-    return "." in filename and filename.rsplit(".", 1)[1].lower() in app.config["ALLOWED_EXTENSIONS"]
+    return (
+        "." in filename
+        and filename.rsplit(".", 1)[1].lower() in app.config["ALLOWED_EXTENSIONS"]
+    )
 
 
 @app.route("/users/search")
@@ -140,47 +148,52 @@ def logout():
 def my_profile():
     return redirect(url_for("view_profile", username=current_user.username))
 
+
 @app.route("/profile/<username>")
 @login_required
 def view_profile(username):
     viewed_user = User.query.filter_by(username=username).first_or_404()
-    weapon_class = request.args.get('weapon_class', viewed_user.weapon_class)
-    
+    weapon_class = request.args.get("weapon_class", viewed_user.weapon_class)
+
     # Получаем предметы для текущего класса оружия и общие предметы
-    items = InventoryItem.query.filter_by(user_id=viewed_user.id).filter(
-        (InventoryItem.weapon_class == weapon_class) | (InventoryItem.weapon_class == 'all')
-    ).all()
+    items = (
+        InventoryItem.query.filter_by(user_id=viewed_user.id)
+        .filter(
+            (InventoryItem.weapon_class == weapon_class)
+            | (InventoryItem.weapon_class == "all")
+        )
+        .all()
+    )
 
     # Подготавливаем данные об оружии с расчетом стажа
     weapon_data = []
     today = date.today()
-    
+
     weapons = [
-        ('longsword', 'Длинный меч'),
-        ('rapier', 'Рапира'),
-        ('sabre', 'Сабля'),
-        ('sword_buckler', 'Меч и баклер')
+        ("longsword", "Длинный меч"),
+        ("rapier", "Рапира"),
+        ("sabre", "Сабля"),
+        ("sword_buckler", "Меч и баклер"),
     ]
-    
+
     for field, name in weapons:
-        has_weapon = getattr(viewed_user, f'has_{field}')
-        since_date = getattr(viewed_user, f'{field}_since')
+        has_weapon = getattr(viewed_user, f"has_{field}")
+        since_date = getattr(viewed_user, f"{field}_since")
         experience = None
-        
+
         if has_weapon and since_date:
             delta = relativedelta(today, since_date)
-            experience = {
-                'years': delta.years,
-                'months': delta.months
+            experience = {"years": delta.years, "months": delta.months}
+
+        weapon_data.append(
+            {
+                "name": name,
+                "field": field,
+                "has": has_weapon,
+                "since": since_date,
+                "experience": experience,
             }
-        
-        weapon_data.append({
-            'name': name,
-            'field': field,
-            'has': has_weapon,
-            'since': since_date,
-            'experience': experience
-        })
+        )
 
     # Формируем инвентарь
     inventory = {
@@ -203,16 +216,17 @@ def view_profile(username):
     }
 
     is_owner = current_user.is_authenticated and current_user.id == viewed_user.id
-    
+
     return render_template(
-        "profile.html", 
-        inventory=inventory, 
-        viewed_user=viewed_user, 
+        "profile.html",
+        inventory=inventory,
+        viewed_user=viewed_user,
         is_owner=is_owner,
         current_weapon_class=weapon_class,
         weapon_data=weapon_data,
-        datetime=datetime  # передаем модуль datetime для шаблона
+        datetime=datetime,  # передаем модуль datetime для шаблона
     )
+
 
 @app.route("/edit_profile/", methods=["GET", "POST"])
 @login_required
@@ -220,63 +234,66 @@ def edit_profile():
     # Подготовка данных об оружии (аналогично view_profile)
     weapon_data = []
     today = date.today()
-    
+
     weapons = [
-        ('longsword', 'Длинный меч'),
-        ('rapier', 'Рапира'),
-        ('sabre', 'Сабля'),
-        ('sword_buckler', 'Меч и баклер')
+        ("longsword", "Длинный меч"),
+        ("rapier", "Рапира"),
+        ("sabre", "Сабля"),
+        ("sword_buckler", "Меч и баклер"),
     ]
-    
+
     for field, name in weapons:
-        has_weapon = getattr(current_user, f'has_{field}')
-        since_date = getattr(current_user, f'{field}_since')
+        has_weapon = getattr(current_user, f"has_{field}")
+        since_date = getattr(current_user, f"{field}_since")
         experience = None
-        
+
         if has_weapon and since_date:
             delta = relativedelta(today, since_date)
-            experience = {
-                'years': delta.years,
-                'months': delta.months
+            experience = {"years": delta.years, "months": delta.months}
+
+        weapon_data.append(
+            {
+                "name": name,
+                "field": field,
+                "has": has_weapon,
+                "since": since_date,
+                "experience": experience,
             }
-        
-        weapon_data.append({
-            'name': name,
-            'field': field,
-            'has': has_weapon,
-            'since': since_date,
-            'experience': experience
-        })
+        )
 
     if request.method == "POST":
         try:
             current_user.real_name = request.form.get("real_name")
-            current_user.age = int(request.form.get("age")) if request.form.get("age") else None
-            
+            current_user.age = (
+                int(request.form.get("age")) if request.form.get("age") else None
+            )
+
             for weapon in weapon_data:
                 has_field = f"has_{weapon['field']}"
                 since_field = f"{weapon['field']}_since"
-                
-                has_weapon = request.form.get(has_field) == 'on'
+
+                has_weapon = request.form.get(has_field) == "on"
                 setattr(current_user, has_field, has_weapon)
-                
+
                 if has_weapon:
                     since_date_str = request.form.get(since_field)
                     if since_date_str:
-                        since_date = datetime.strptime(since_date_str, '%Y-%m-%d').date()
+                        since_date = datetime.strptime(
+                            since_date_str, "%Y-%m-%d"
+                        ).date()
                         setattr(current_user, since_field, since_date)
                     else:
                         # Если дата не указана, но оружие выбрано - устанавливаем текущую дату
                         setattr(current_user, since_field, today)
                 else:
                     setattr(current_user, since_field, None)
-            
+
             db.session.commit()
             flash("Профиль успешно обновлен", "success")
             return redirect(url_for("view_profile", username=current_user.username))
         except ValueError as e:
             flash(f"Ошибка в данных: {str(e)}", "error")
-    
+
     return render_template("edit_profile.html", weapon_data=weapon_data)
 
 
@@ -291,43 +308,40 @@ def set_weapon_class():
     return jsonify({"status": "error", "message": "Invalid weapon class"})
 
 
-
 # Обработчик загрузки/редактирования
 @app.route("/upload/<item_type>", methods=["GET", "POST"])
 @login_required
 def upload(item_type):
-    weapon_class = request.args.get('weapon_class', current_user.weapon_class)
+    weapon_class = request.args.get("weapon_class", current_user.weapon_class)
     item = InventoryItem.query.filter_by(
-        user_id=current_user.id,
-        item_type=item_type,
-        weapon_class=weapon_class
+        user_id=current_user.id, item_type=item_type, weapon_class=weapon_class
     ).first()
 
     if request.method == "POST":
         # Обработка изображений
         image_paths = []
-        
+
         # Если редактирование - обрабатываем удаление
         if item and item.image_paths:
-            current_images = item.image_paths.split(',')
-            delete_images = request.form.getlist('delete_images')
-            
+            current_images = item.image_paths.split(",")
+            delete_images = request.form.getlist("delete_images")
+
             # Удаляем отмеченные файлы
             for img in delete_images:
                 try:
-                    os.remove(os.path.join(app.config['UPLOAD_FOLDER'], img))
+                    os.remove(os.path.join(app.config["UPLOAD_FOLDER"], img))
                 except OSError:
                     pass
-            
+
             # Оставляем неотмеченные
             image_paths = [img for img in current_images if img not in delete_images]
 
         # Обрабатываем новые изображения
-        files = request.files.getlist('images')
+        files = request.files.getlist("images")
         for i, file in enumerate(files):
             if len(image_paths) >= 5:
                 break
-                
+
             if file and file.filename and allowed_file(file.filename):
                 filename = secure_filename(
                     f"{current_user.id}_{weapon_class}_{item_type}_{len(image_paths)}.{file.filename.rsplit('.', 1)[1].lower()}"
@@ -335,7 +349,6 @@ def upload(item_type):
                 filepath = os.path.join(app.config["UPLOAD_FOLDER"], filename)
                 file.save(filepath)
                 image_paths.append(filename)
-
         # Создаем или обновляем запись
         if not item:
             item = InventoryItem(
@@ -346,8 +359,11 @@ def upload(item_type):
                 description=request.form.get("description", ""),
                 pros=request.form.get("pros", ""),
                 cons=request.form.get("cons", ""),
+                model=request.form.get("model", ""),
+                model_site=request.form.get("model_site", ""),
                 rating=int(request.form.get("rating", 3)),
             )
+            print(item.model)
             db.session.add(item)
         else:
             item.image_paths = ",".join(image_paths) if image_paths else ""
@@ -355,33 +371,38 @@ def upload(item_type):
             item.pros = request.form.get("pros", "")
             item.cons = request.form.get("cons", "")
             item.rating = int(request.form.get("rating", 3))
+            item.model = (request.form.get("model", ""))
+            item.model_site = (request.form.get("model_site", ""))
 
+            print("before",item.model)
         db.session.commit()
-        return redirect(url_for("view_profile", username=current_user.username, weapon_class=weapon_class))
+        return redirect(
+            url_for(
+                "view_profile",
+                username=current_user.username,
+                weapon_class=weapon_class,
+            )
+        )
 
     return render_template(
-        "upload.html",
-        item_type=item_type,
-        weapon_class=weapon_class,
-        item=item
+        "upload.html", item_type=item_type, weapon_class=weapon_class, item=item
     )
+
 
 # Обработчик удаления предмета
 @app.route("/delete/<item_type>", methods=["POST"])
 @login_required
 def delete_item(item_type):
-    weapon_class = request.args.get('weapon_class', current_user.weapon_class)
+    weapon_class = request.args.get("weapon_class", current_user.weapon_class)
     item = InventoryItem.query.filter_by(
-        user_id=current_user.id,
-        item_type=item_type,
-        weapon_class=weapon_class
+        user_id=current_user.id, item_type=item_type, weapon_class=weapon_class
     ).first_or_404()
 
     # Удаляем все изображения
     if item.image_paths:
-        for image_path in item.image_paths.split(','):
+        for image_path in item.image_paths.split(","):
             try:
-                os.remove(os.path.join(app.config['UPLOAD_FOLDER'], image_path))
+                os.remove(os.path.join(app.config["UPLOAD_FOLDER"], image_path))
             except OSError:
                 pass
 
@@ -389,7 +410,11 @@ def delete_item(item_type):
     db.session.delete(item)
     db.session.commit()
     flash("Предмет удален", "success")
-    return redirect(url_for("view_profile", username=current_user.username, weapon_class=weapon_class))
+    return redirect(
+        url_for(
+            "view_profile", username=current_user.username, weapon_class=weapon_class
+        )
+    )
 
 
 if __name__ == "__main__":
@@ -397,4 +422,4 @@ if __name__ == "__main__":
         db.create_all()
         if not os.path.exists(app.config["UPLOAD_FOLDER"]):
             os.makedirs(app.config["UPLOAD_FOLDER"])
-    app.run(host="192.168.0.108", port=8088, debug=False)
+    app.run(host="127.0.0.1", port=5000, debug=True)

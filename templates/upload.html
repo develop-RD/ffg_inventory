@@ -55,7 +55,22 @@
             <label for="cons">Минусы:</label>
             <textarea id="cons" name="cons" required>{{ item.cons if item else '' }}</textarea>
         </div>
-        
+       <!--  Выбор изготовителя --> 
+        <div class="form-group">
+            <label for="model">Изготовитель:</label>
+            <select id="model" name="model"> 
+                <option value="">-- Выберите изготовителя --</option>
+                <option value="Kvetun" {% if item and item.model == 'Kvetun' %}selected{% endif %}>Кветунь</option>
+                <option value="Gold_Sokol" {% if item and item.model == 'Gold_Sokol' %}selected{% endif %}>Золотой сокол</option>
+                <option value="PikeArmory" {% if item and item.model == 'PikeArmory' %}selected{% endif %}>Pike Armory</option>  
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="model_site">Ссылка на модель:</label>
+            <textarea id="model_site" name="model_site" required>{{ item.model_site if item else '' }}</textarea>
+        </div>
+
         <div class="form-group">
             <label for="rating">Рейтинг (1-5):</label>
             <input type="number" id="rating" name="rating" 
