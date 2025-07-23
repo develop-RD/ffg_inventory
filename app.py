@@ -80,37 +80,72 @@ def user_search():
 @app.route("/search")
 @login_required
 def user_search_equip():
+       # Получаем параметры поиска из запроса
+    manufacturer = request.args.get("manufacturer", "")
+    item_type = request.args.get("item_type", "")
+    weapon_class = request.args.get("weapon_class", "all")
+    
     users = User.query.order_by(User.username).all()
-    print("all users =", type(users))
-    checkModel = "Kvetun"
-    inventory = []
-    # перебираем пользователей
-    for countUser in users:
-        print("pereb", countUser)
-        viewed_user = User.query.filter_by(username=countUser.username).first_or_404()
-
-        for weapon_class in ["sword_buckler", "longsword", "rapier_dagger", "sabre"]:
-            # Получаем предметы для текущего класса оружия и общие предметы
-            items = (
-                InventoryItem.query.filter_by(user_id=viewed_user.id)
-                .filter(
-                    (InventoryItem.weapon_class == weapon_class)
-                    | (InventoryItem.weapon_class == "all")
-                )
-                .all()
+    results = []
+    
+    for user in users:
+        # Получаем все предметы пользователя, которые соответствуют критериям поиска
+        query = InventoryItem.query.filter_by(user_id=user.id)
+        
+        if manufacturer:
+            query = query.filter_by(model=manufacturer)
+        
+        if item_type:
+            query = query.filter_by(item_type=item_type)
+        
+        if weapon_class != "all":
+            query = query.filter(
+                (InventoryItem.weapon_class == weapon_class) |
+                (InventoryItem.weapon_class == "all")
             )
-            # Формируем инвентарь
-            inventory = {
-                "gorget": next((i for i in items if i.model == checkModel), None),
-                "head": next((i for i in items if i.model == checkModel), None),
-            }
-            print("users = ", countUser.username)
-            print("inventory=", inventory)
-            print("WP_class=", weapon_class)
-            print("model=", checkModel)
+        
+        items = query.all()
+        
+        if items:
+            # Группируем предметы по классу оружия
+            items_by_class = {}
+            for item in items:
+                if item.weapon_class not in items_by_class:
+                    items_by_class[item.weapon_class] = []
+                items_by_class[item.weapon_class].append(item)
+            
+            results.append({
+                "user": user,
+                "items_by_class": items_by_class
+            })
 
-    return render_template("search.html", users=users)
-
+    # Список типов предметов для формы поиска
+    item_types = [
+        "gorget", "head", "namasnik", "naplech", "torso", 
+        "ng", "brass", "lokti", "gloves", "sht", 
+        "pants", "shoes", "bag", "sword1", "sword2", "sword3"
+    ]
+    
+    return render_template(
+        "search.html",
+        results=results,
+        search_manufacturer=manufacturer,
+        search_item_type=item_type,
+        search_weapon_class=weapon_class,
+        weapon_classes={
+            "sword_buckler": "Меч и баклер",
+            "longsword": "Длинный меч",
+            "rapier_dagger": "Рапира и дага",
+            "sabre": "Сабля",
+            "all": "Все классы"
+        },
+        manufacturers=[
+            ("Kvetun", "Кветунь"),
+            ("Gold_Sokol", "Золотой сокол"),
+            ("PikeArmory", "Pike Armory")
+        ],
+        item_types=item_types
+    ) 
 
 @app.route("/users")
 @login_required

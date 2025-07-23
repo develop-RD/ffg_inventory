@@ -3,24 +3,514 @@
 {% block title %}Поиск по снаряжению{% endblock %}
 
 {% block content %}
-<div class="user-list-container">
-    <h1>Все пользователи</h1>
+<div class="search-container">
+    <h1>Поиск по снаряжению</h1>
     
-    <div class="user-list">
-        {% for user in users %}
-        <div class="user-card">
-            <a href="{{ url_for('view_profile', username=user.username) }}" class="user-link">
-                <span class="username">{{ user.username }}</span>
-            </a>
+    <div class="search-box">
+        <form action="{{ url_for('user_search_equip') }}" method="GET">
+            <div class="form-group">
+                <label for="manufacturer">Изготовитель:</label>
+                <select id="manufacturer" name="manufacturer">
+                    <option value="">-- Все изготовители --</option>
+                    {% for value, name in manufacturers %}
+                    <option value="{{ value }}" {% if search_manufacturer == value %}selected{% endif %}>{{ name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="item_type">Тип предмета:</label>
+                <select id="item_type" name="item_type">
+                    <option value="">-- Все предметы --</option>
+                    {% for type in item_types %}
+                    <option value="{{ type }}" {% if search_item_type == type %}selected{% endif %}>{{ type }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="weapon_class">Класс оружия:</label>
+                <select id="weapon_class" name="weapon_class">
+                    {% for value, name in weapon_classes.items() %}
+                    <option value="{{ value }}" {% if search_weapon_class == value %}selected{% endif %}>{{ name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <button type="submit" class="btn">Найти</button>
+        </form>
+    </div>
+    
+    {% if results %}
+    <div class="search-results">
+        <h2>Результаты поиска</h2>
+        <p>Найдено: {{ results|length }} пользователей</p>
+        
+        {% for result in results %}
+        <div class="user-result">
+            <h3>
+                <a href="{{ url_for('view_profile', username=result.user.username) }}">
+                    {{ result.user.username }}
+                </a>
+            </h3>
+            
+            {% for weapon_class, items in result.items_by_class.items() %}
+            <div class="weapon-class-section">
+                <h4>{{ weapon_classes.get(weapon_class, weapon_class) }}</h4>
+                
+                <div class="items-grid">
+                    {% for item in items %}
+                    <div class="search-item" onclick="showTooltip(event)">
+                        <div class="item-type">{{ item.item_type }}</div>
+                        {% if item.image_paths %}
+                        <img src="{{ url_for('static', filename='uploads/' + item.image_paths.split(',')[0]) }}" 
+                             alt="{{ item.item_type }}"
+                             data-description="{{ item.description }}"
+                             data-pros="{{ item.pros }}"
+                             data-cons="{{ item.cons }}"
+                             data-model="{{ item.model }}"
+                             data-rating="{{ item.rating }}"
+                             data-images="{{ item.image_paths }}">
+                        {% else %}
+                        <div class="no-image">Нет изображения</div>
+                        {% endif %}
+                        <div class="item-model">
+                            {% if item.model == "Kvetun" %}Кветунь
+                            {% elif item.model == "Gold_Sokol" %}Золотой сокол
+                            {% elif item.model == "PikeArmory" %}Pike Armory
+                            {% else %}{{ item.model }}
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
         </div>
         {% endfor %}
     </div>
+    {% elif request.args.get('manufacturer') or request.args.get('item_type') or request.args.get('weapon_class') %}
+    <div class="no-results">
+        <p>Ничего не найдено по вашему запросу.</p>
+    </div>
+    {% endif %}
 </div>
-<div class="search-box">
-    <form action="{{ url_for('user_search') }}" method="GET">
-        <input type="text" name="q" placeholder="Поиск пользователей..." 
-               value="{{ search_query if search_query }}">
-        <button type="submit">Найти</button>
-    </form>
+
+<!-- Подключаем тот же tooltip, что и в profile.html -->
+<div class="tooltip-container" id="tooltipContainer">
+    <div class="tooltip-content">
+        <span class="close-btn" onclick="closeTooltip()">&times;</span>
+        <!-- Галерея изображений -->
+        <div class="image-gallery" id="imageGallery">
+            <div class="gallery-nav">
+                <button class="gallery-prev" onclick="prevImage()">❮</button>
+                <span class="gallery-counter" id="galleryCounter">1/1</span>
+                <button class="gallery-next" onclick="nextImage()">❯</button>
+            </div>
+            <div class="gallery-main-image" id="galleryMainImage"></div>
+            <div class="gallery-thumbnails" id="galleryThumbnails"></div>
+        </div>
+
+        <div class="details"></div>
+        <div class="info-section"></div>
+        <div class="pros" id="head_pros"><h3>Плюсы</h3></div>
+        <div class="cons" id="head_cons"><h3>Минусы</h3></div>
+        <div class="stars"><h4>Рейтинг</h4></div>
+    </div>
 </div>
+
+<script>
+// Копируем функции из profile.html для работы tooltip
+let currentGalleryImages = [];
+let currentGalleryIndex = 0;
+let currentTooltipCell = null;
+
+function showTooltip(event) {
+    if (currentTooltipCell === event.currentTarget) {
+        closeTooltip();
+        return;
+    } 
+
+    currentTooltipCell = event.currentTarget; 
+    event.stopPropagation();
+    
+    const tooltip = document.getElementById('tooltipContainer');
+    tooltip.style.display = 'flex';
+
+    // Получаем все изображения предмета
+    const img = currentTooltipCell.querySelector('img');
+    const imagePaths = img ? img.getAttribute('data-images').split(',') : [];
+    currentGalleryImages = imagePaths;
+    currentGalleryIndex = 0;
+    
+    // Инициализируем галерею
+    initGallery();
+
+    handleCell(currentTooltipCell);
+}
+
+function initGallery() {
+    const mainImage = document.getElementById('galleryMainImage');
+    const thumbnails = document.getElementById('galleryThumbnails');
+    const counter = document.getElementById('galleryCounter');
+    
+    mainImage.innerHTML = '';
+    thumbnails.innerHTML = '';
+    
+    if (currentGalleryImages.length === 0) {
+        mainImage.innerHTML = '<p>Нет изображений</p>';
+        counter.textContent = '0/0';
+        return;
+    }
+    
+    // Главное изображение
+    const img = document.createElement('img');
+    img.src = `/static/uploads/${currentGalleryImages[currentGalleryIndex]}`;
+    img.alt = 'Изображение предмета';
+    mainImage.appendChild(img);
+    
+    // Миниатюры
+    currentGalleryImages.forEach((path, index) => {
+        const thumb = document.createElement('img');
+        thumb.src = `/static/uploads/${path}`;
+        thumb.alt = `Миниатюра ${index + 1}`;
+        thumb.className = index === currentGalleryIndex ? 'active' : '';
+        thumb.onclick = () => changeImage(index);
+        thumbnails.appendChild(thumb);
+    });
+    
+    // Счетчик
+    counter.textContent = `${currentGalleryIndex + 1}/${currentGalleryImages.length}`;
+}
+
+function changeImage(index) {
+    currentGalleryIndex = index;
+    initGallery();
+}
+
+function prevImage() {
+    if (currentGalleryImages.length === 0) return;
+    currentGalleryIndex = (currentGalleryIndex - 1 + currentGalleryImages.length) % currentGalleryImages.length;
+    initGallery();
+}
+
+function nextImage() {
+    if (currentGalleryImages.length === 0) return;
+    currentGalleryIndex = (currentGalleryIndex + 1) % currentGalleryImages.length;
+    initGallery();
+}
+
+function handleCell(cell) {
+    const img = cell.querySelector('img');
+    if (!img) return;
+    
+    const description = img.getAttribute('data-description');
+    const pros = img.getAttribute('data-pros');
+    const cons = img.getAttribute('data-cons');
+    const model = img.getAttribute('data-model');
+    const rating = img.getAttribute('data-rating');
+    
+    fillPros(description, pros, cons, model, rating);
+}
+
+function fillPros(desc, Pros, cons, model, rating) {
+    const prosList = Pros ? Pros.split('\n') : [];
+    const consList = cons ? cons.split('\n') : [];
+    const detContainer = document.querySelector('.details');
+    const prosContainer = document.querySelector('.pros');
+    const consContainer = document.querySelector('.cons');
+    const starsContainer = document.querySelector('.stars');
+
+    // Преобразовываем model в кириллицу
+    if (model == "PikeArmory") {
+        model = "Pike Armory";
+    } else if (model == "Gold_Sokol") {
+        model = "Золотой Сокол";
+    } else if (model == "Kvetun") {
+        model = "Кветунь";
+    } else {
+        model = model || "не указан";
+    }
+
+    prosContainer.innerHTML = '<h3>Плюсы</h3>';
+    consContainer.innerHTML = '<h3>Минусы</h3>';
+    detContainer.innerHTML = `
+      <section>
+        <h3><strong>Описание</strong></h3>
+        <div>${desc || 'Нет описания'}</div>
+        <h3><strong>Изготовитель</strong></h3>
+        <div>${model}</div>
+      </section>
+    `;
+    
+    let stars = '';
+    const ratingValue = rating ? parseInt(rating) : 0;
+    for (let i = 0; i < 5; i++) {
+        stars += i < ratingValue ? '★' : '☆';
+    }
+    starsContainer.innerHTML = `
+      <section>
+        <h3><strong>Рейтинг</strong></h3>
+        <div>${stars}</div>
+      </section>
+    `;
+    
+    for (const elem of prosList) {
+        if (elem.trim()) {
+            const li = document.createElement('li');
+            li.textContent = elem;
+            prosContainer.appendChild(li);
+        }
+    }
+
+    for (const elem of consList) {
+        if (elem.trim()) {
+            const li = document.createElement('li');
+            li.textContent = elem;
+            consContainer.appendChild(li);
+        }
+    }
+}
+
+function closeTooltip() {
+    document.getElementById('tooltipContainer').style.display = 'none';
+    currentTooltipCell = null;
+}
+</script>
+
+<style>
+.search-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.search-box {
+    background: #f5f5f5;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 30px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.form-group select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.btn {
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.btn:hover {
+    background-color: #3e8e41;
+}
+
+.search-results {
+    margin-top: 20px;
+}
+
+.user-result {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.user-result h3 {
+    margin-top: 0;
+    color: #333;
+}
+
+.user-result h3 a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.user-result h3 a:hover {
+    text-decoration: underline;
+}
+
+.weapon-class-section {
+    margin-top: 15px;
+    padding: 15px;
+    background: #f9f9f9;
+    border-radius: 5px;
+}
+
+.weapon-class-section h4 {
+    margin-top: 0;
+    color: #555;
+}
+
+.items-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 15px;
+    margin-top: 10px;
+}
+
+.search-item {
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 10px;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.search-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+}
+
+.search-item .item-type {
+    font-weight: bold;
+    margin-bottom: 5px;
+    text-transform: capitalize;
+}
+
+.search-item img {
+    width: 100%;
+    height: 120px;
+    object-fit: contain;
+    margin-bottom: 5px;
+}
+
+.search-item .no-image {
+    width: 100%;
+    height: 120px;
+    background: #f0f0f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #777;
+    margin-bottom: 5px;
+}
+
+.search-item .item-model {
+    font-size: 12px;
+    color: #666;
+}
+
+.no-results {
+    text-align: center;
+    padding: 40px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+/* Стили для tooltip (аналогичные profile.html) */
+.tooltip-container {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+}
+
+.tooltip-content {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+}
+
+.close-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 24px;
+    cursor: pointer;
+    color: #333;
+}
+
+/* Дополнительные стили для галереи изображений */
+.image-gallery {
+    margin-bottom: 20px;
+}
+
+.gallery-main-image {
+    width: 100%;
+    height: 200px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.gallery-main-image img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.gallery-thumbnails {
+    display: flex;
+    gap: 5px;
+    overflow-x: auto;
+    padding-bottom: 5px;
+}
+
+.gallery-thumbnails img {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    cursor: pointer;
+    border: 2px solid transparent;
+}
+
+.gallery-thumbnails img.active {
+    border-color: #4CAF50;
+}
+
+.gallery-nav {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.gallery-prev, .gallery-next {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    color: #333;
+}
+
+.gallery-counter {
+    font-size: 14px;
+    color: #666;
+}
+</style>
 {% endblock %}

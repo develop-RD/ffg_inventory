@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}Поиск по снаряжению{% endblock %}
+
+{% block content %}
+<div class="user-list-container">
+    <h1>Все пользователи</h1>
+    
+    <div class="user-list">
+        {% for user in users %}
+        <div class="user-card">
+            <a href="{{ url_for('view_profile', username=user.username) }}" class="user-link">
+                <span class="username">{{ user.username }}</span>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+<div class="search-box">
+    <form action="{{ url_for('user_search') }}" method="GET">
+        <input type="text" name="q" placeholder="Поиск пользователей..." 
+               value="{{ search_query if search_query }}">
+        <button type="submit">Найти</button>
+    </form>
+</div>
+{% endblock %}
