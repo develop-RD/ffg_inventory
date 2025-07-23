@@ -77,10 +77,46 @@ def user_search():
     return render_template("users.html", users=users, search_query=query)
 
 
+@app.route("/search")
+@login_required
+def user_search_equip():
+    users = User.query.order_by(User.username).all()
+    print("all users =", type(users))
+    checkModel = "Kvetun"
+    inventory = []
+    # перебираем пользователей
+    for countUser in users:
+        print("pereb", countUser)
+        viewed_user = User.query.filter_by(username=countUser.username).first_or_404()
+
+        for weapon_class in ["sword_buckler", "longsword", "rapier_dagger", "sabre"]:
+            # Получаем предметы для текущего класса оружия и общие предметы
+            items = (
+                InventoryItem.query.filter_by(user_id=viewed_user.id)
+                .filter(
+                    (InventoryItem.weapon_class == weapon_class)
+                    | (InventoryItem.weapon_class == "all")
+                )
+                .all()
+            )
+            # Формируем инвентарь
+            inventory = {
+                "gorget": next((i for i in items if i.model == checkModel), None),
+                "head": next((i for i in items if i.model == checkModel), None),
+            }
+            print("users = ", countUser.username)
+            print("inventory=", inventory)
+            print("WP_class=", weapon_class)
+            print("model=", checkModel)
+
+    return render_template("search.html", users=users)
+
+
 @app.route("/users")
 @login_required
 def user_list():
     users = User.query.order_by(User.username).all()
+
     return render_template("users.html", users=users)
 
 
@@ -371,10 +407,10 @@ def upload(item_type):
             item.pros = request.form.get("pros", "")
             item.cons = request.form.get("cons", "")
             item.rating = int(request.form.get("rating", 3))
-            item.model = (request.form.get("model", ""))
-            item.model_site = (request.form.get("model_site", ""))
+            item.model = request.form.get("model", "")
+            item.model_site = request.form.get("model_site", "")
 
-            print("before",item.model)
+            print("before", item.model)
         db.session.commit()
         return redirect(
             url_for(

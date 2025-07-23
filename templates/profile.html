@@ -85,6 +85,7 @@
                         data-description="{{ inventory.gorget.description }}"
                         data-pros="{{ inventory.gorget.pros }}"
                         data-cons="{{ inventory.gorget.cons }}"
+                        data-model="{{ inventory.gorget.model }}"
                         data-rating="{{ inventory.gorget.rating }}"
                         data-images="{{ inventory.gorget.image_paths if inventory.gorget.image_paths else '' }}">
                     
@@ -116,6 +117,7 @@
                         data-description="{{ inventory.namasnik.description }}"
                         data-pros="{{ inventory.namasnik.pros }}"
                         data-cons="{{ inventory.namasnik.cons }}"
+                        data-model="{{ inventory.namasnik.model }}"
                         data-rating="{{ inventory.namasnik.rating }}"
 						data-images="{{ inventory.namasnik.image_paths if inventory.namasnik.image_paths else '' }}">
                     
@@ -749,8 +751,9 @@ function handleCell(cell) {
     const description = img.getAttribute('data-description');
     const pros = img.getAttribute('data-pros');
     const cons = img.getAttribute('data-cons');
+    const model = img.getAttribute('data-model');
     const rating = img.getAttribute('data-rating');
-    fillPros(description,pros,cons,rating);
+    fillPros(description,pros,cons,model,rating);
 }
 
 function closeTooltip() {
@@ -759,20 +762,35 @@ function closeTooltip() {
     currentTooltipCell = null;
 }
 
-function fillPros(desc,Pros,cons,rating) {
+function fillPros(desc,Pros,cons,model,rating) {
     const prosList = [Pros.split('\n')];
     const consList = [cons.split('\n')];
     const detContainer = document.querySelector('.details');
     const prosContainer = document.querySelector('.pros');
     const consContainer = document.querySelector('.cons');
     const starsContainer = document.querySelector('.stars');
-    
+   
+    console.log("model=",model)
+
+    //Преобразовываем model в кириллицу
+    if (model == "PikeArmory"){
+        model = "Pike Armory"
+    }else if (model == "Gold_Sokol"){
+        model = "Золотой Сокол"
+    }else if (model == "Kvetun"){
+        model = "Кветунь"
+    }else{
+        model = " не указан "
+    }
+
     prosContainer.innerHTML = '<h3>Плюсы</h3>';
     consContainer.innerHTML = '<h3>Минусы</h3>';
     detContainer.innerHTML = `
       <section>
         <h3><strong>Описание</strong></h3>
         <div>${desc}</div>
+        <h3><strong>Изготовитель </strong></h3>
+        <div>${model}</div>
       </section>
     `;
     
