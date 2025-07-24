@@ -63,12 +63,21 @@
                 <option value="Kvetun" {% if item and item.model == 'Kvetun' %}selected{% endif %}>Кветунь</option>
                 <option value="Gold_Sokol" {% if item and item.model == 'Gold_Sokol' %}selected{% endif %}>Золотой сокол</option>
                 <option value="PikeArmory" {% if item and item.model == 'PikeArmory' %}selected{% endif %}>Pike Armory</option>  
+                <option value="PBT" {% if item and item.model == 'PBT' %}selected{% endif %}>PBT</option>  
+                <option value="SPES" {% if item and item.model == 'SPES' %}selected{% endif %}>SPES</option>  
+                <option value="Fencing Shop" {% if item and item.model == 'Fencing_shop' %}selected{% endif %}>Fencing shop</option>  
+                <option value="Pangolins" {% if item and item.model == 'pangolins' %}selected{% endif %}>Панголины</option>  
+                <option value="Foxtail" {% if item and item.model == 'foxtail' %}selected{% endif %}>Fox Tail</option>  
+                <option value="Raidu" {% if item and item.model == 'Raidu' %}selected{% endif %}>Raidu</option>  
+                <option value="Under_cover" {% if item and item.model == 'under_cover' %}selected{% endif %}>Under Cover</option>  
+                <option value="ultima_ratio" {% if item and item.model == 'ultima_ratio' %}selected{% endif %}>Ultima Ratio</option>  
+                <option value="raven_blade" {% if item and item.model == 'raven_blade' %}selected{% endif %}>Raven Blade</option>  
             </select>
         </div>
 
         <div class="form-group">
             <label for="model_site">Ссылка на модель:</label>
-            <textarea id="model_site" name="model_site" required>{{ item.model_site if item else '' }}</textarea>
+            <textarea id="model_site" name="model_site" >{{ item.model_site if item else '' }}</textarea>
         </div>
 
         <div class="form-group">

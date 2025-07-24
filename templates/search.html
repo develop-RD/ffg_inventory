@@ -44,7 +44,6 @@
                             {% endif%}
 
                     </option>
-                    <!--<option value="{{ type }}" {% if search_item_type == type %}selected{% endif %}>{{ type }}</option>-->
                     {% endfor %}
                 </select>
             </div>
@@ -58,6 +57,16 @@
                 </select>
             </div>
             
+            <div class="form-group">
+                <label for="rating">Рейтинг:</label>
+                <select id="rating" name="rating">
+                    <option value="">-- Любой рейтинг --</option>
+                    {% for value in rating %}
+                    <option value="{{ value }}" {% if search_rating == value %}selected{% endif %}>{{ value }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
             <button type="submit" class="btn">Найти</button>
         </form>
     </div>
@@ -269,6 +278,14 @@ function fillPros(desc, Pros, cons, model, rating) {
         model = "Золотой Сокол";
     } else if (model == "Kvetun") {
         model = "Кветунь";
+    } else if (model == "SPES") {
+        model = "SPES";
+    } else if (model == "pangolins") {
+        model = "Панголины";
+    } else if (model == "Fencing_shop") {
+        model = "Fencing shop";
+    } else if (model == "PBT") {
+        model = "PBT";
     } else {
         model = model || "не указан";
     }

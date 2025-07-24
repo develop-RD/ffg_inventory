@@ -84,7 +84,7 @@ def user_search_equip():
     manufacturer = request.args.get("manufacturer", "")
     item_type = request.args.get("item_type", "")
     weapon_class = request.args.get("weapon_class", "all")
-    
+    rating_item = request.args.get("rating", "")
     users = User.query.order_by(User.username).all()
     results = []
     
@@ -98,12 +98,15 @@ def user_search_equip():
         if item_type:
             query = query.filter_by(item_type=item_type)
         
+        if rating_item:
+            query = query.filter_by(rating=rating_item)
+
+        print(rating_item)
         if weapon_class != "all":
             query = query.filter(
                 (InventoryItem.weapon_class == weapon_class) |
                 (InventoryItem.weapon_class == "all")
             )
-        
         items = query.all()
         
         if items:
@@ -142,8 +145,19 @@ def user_search_equip():
         manufacturers=[
             ("Kvetun", "Кветунь"),
             ("Gold_Sokol", "Золотой сокол"),
+            ("PBT", "PBT"),
+            ("SPES", "SPES"),
+            ("Foxtail", "Fox Tail"),
+            ("Fencing_shop", "Fencing shop"),
+            ("pangolins", "Панголины"),
+            ("Raidu", "Raidu"),
+            ("under_cover", "Under Cover"),
+            ("ultima_ratio", "Ultima Ratio"),
+            ("raven_blade", "RavenBlade"),
             ("PikeArmory", "Pike Armory")
         ],
+        rating=[1,2,3,4,5],
+        search_rating=rating_item,
         item_types=item_types
     ) 
 
