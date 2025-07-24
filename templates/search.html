@@ -23,7 +23,28 @@
                 <select id="item_type" name="item_type">
                     <option value="">-- Все предметы --</option>
                     {% for type in item_types %}
-                    <option value="{{ type }}" {% if search_item_type == type %}selected{% endif %}>{{ type }}</option>
+                    <option value="{{ type }}" {% if search_item_type == type %}selected{% endif %}>
+                            {% if type == 'gorget' %} Горжет
+                            {% elif type == 'namasnik' %} Намасник
+                            {% elif type == 'head' %} Маска
+                            {% elif type == 'naplech' %} Наплечники
+                            {% elif type == 'sword1' %} Оружие 1 
+                            {% elif type == 'torso' %} Куртка 
+                            {% elif type == 'ng' %} Нагрудник 
+                            {% elif type == 'sht' %} Штаны 
+                            {% elif type == 'pants' %} Ноги 
+                            {% elif type == 'brass' %} Брассары 
+                            {% elif type == 'sword2' %} Оружие 2 
+                            {% elif type == 'bag' %} Сумка 
+                            {% elif type == 'lokti' %} Локти 
+                            {% elif type == 'gloves' %} Перчатки 
+                            {% elif type == 'sword3' %} Оружие 3 
+                            {% elif type == 'shoes' %} Обувь 
+                            {%else%} - 
+                            {% endif%}
+
+                    </option>
+                    <!--<option value="{{ type }}" {% if search_item_type == type %}selected{% endif %}>{{ type }}</option>-->
                     {% endfor %}
                 </select>
             </div>
@@ -61,7 +82,27 @@
                 <div class="items-grid">
                     {% for item in items %}
                     <div class="search-item" onclick="showTooltip(event)">
-                        <div class="item-type">{{ item.item_type }}</div>
+                        <!--<div class="item-type">{{ item.item_type }}</div>-->
+                        <div class="item-type">
+                            {% if item.item_type == 'gorget' %} Горжет
+                            {% elif item.item_type == 'namasnik' %} Намасник
+                            {% elif item.item_type == 'head' %} Маска
+                            {% elif item.item_type == 'naplech' %} Наплечники
+                            {% elif item.item_type == 'sword1' %} Оружие 1 
+                            {% elif item.item_type == 'torso' %} Куртка 
+                            {% elif item.item_type == 'ng' %} Нагрудник 
+                            {% elif item.item_type == 'sht' %} Штаны 
+                            {% elif item.item_type == 'pants' %} Ноги 
+                            {% elif item.item_type == 'brass' %} Брассары 
+                            {% elif item.item_type == 'sword2' %} Оружие 2 
+                            {% elif item.item_type == 'bag' %} Сумка 
+                            {% elif item.item_type == 'lokti' %} Локти 
+                            {% elif item.item_type == 'gloves' %} Перчатки 
+                            {% elif item.item_type == 'sword3' %} Оружие 3 
+                            {% elif item.item_type == 'shoes' %} Обувь 
+                            {%else%} - 
+                            {% endif%}
+                        </div>
                         {% if item.image_paths %}
                         <img src="{{ url_for('static', filename='uploads/' + item.image_paths.split(',')[0]) }}" 
                              alt="{{ item.item_type }}"

@@ -304,7 +304,7 @@
             {% if inventory.pants %}
                 <div class="item-container">
 					<img src="{{ url_for('static', filename='uploads/' + inventory.pants.image_paths.split(',')[0]) if inventory.pants.image_paths else '' }}"
-                         alt="Штаны"
+                         alt="Ноги"
                          data-description="{{ inventory.pants.description }}"
                          data-pros="{{ inventory.pants.pros }}"
                          data-cons="{{ inventory.pants.cons }}"
