@@ -178,14 +178,18 @@
             {% if inventory.sword1 %}
                 <div class="item-container">
 					<img src="{{ url_for('static', filename='uploads/' + inventory.sword1.image_paths.split(',')[0]) if inventory.sword1.image_paths else '' }}"				
-                         alt="Оружие 1"
-                         data-description="{{ inventory.sword1.description }}"
-                         data-pros="{{ inventory.sword1.pros }}"
-                         data-cons="{{ inventory.sword1.cons }}"
-                         data-model="{{ inventory.sword1.model }}"
-                         data-rating="{{ inventory.sword1.rating }}"
-						 data-images="{{ inventory.sword1.image_paths if inventory.sword1.image_paths else '' }}">
-                    
+                 alt="Оружие 1"
+                 data-description="{{ inventory.sword1.description }}"
+                 data-pros="{{ inventory.sword1.pros }}"
+                 data-cons="{{ inventory.sword1.cons }}"
+                 data-model="{{ inventory.sword1.model }}"
+                 data-rating="{{ inventory.sword1.rating }}"
+                 data-images="{{ inventory.sword1.image_paths if inventory.sword1.image_paths else '' }}"
+                 data-weight="{{ inventory.sword1.weight }}"
+                 data-length="{{ inventory.sword1.length }}"
+                 data-balance-point="{{ inventory.sword1.balance_point }}"
+                 data-point-perimeter="{{ inventory.sword1.point_perimeter }}"
+                 data-stiffness="{{ inventory.sword1.stiffness }}">                  
                     {% if is_owner %}
                     <div class="item-controls">
                         <a href="{{ url_for('upload', item_type='sword1', weapon_class=current_weapon_class) }}" class="edit-btn" title="Редактировать">✏️</a>
@@ -444,15 +448,19 @@
             <div class="cell-label">Оружие 2</div>
             {% if inventory.sword2 %}
                 <div class="item-container">
-					<img src="{{ url_for('static', filename='uploads/' + inventory.sword2.image_paths.split(',')[0]) if inventory.sword2.image_paths else '' }}"				
-                         alt="Оружие 2"
-                         data-description="{{ inventory.sword2.description }}"
-                         data-pros="{{ inventory.sword2.pros }}"
-                         data-cons="{{ inventory.sword2.cons }}"
-                         data-model="{{ inventory.sword2.model }}"
-                         data-rating="{{ inventory.sword2.rating }}"
-						 data-images="{{ inventory.sword2.image_paths if inventory.sword2.image_paths else '' }}">
-                    
+                    <img src="{{ url_for('static', filename='uploads/' + inventory.sword2.image_paths.split(',')[0]) if inventory.sword2.image_paths else '' }}"				
+     alt="Оружие 2"
+     data-description="{{ inventory.sword2.description }}"
+     data-pros="{{ inventory.sword2.pros }}"
+     data-cons="{{ inventory.sword2.cons }}"
+     data-model="{{ inventory.sword2.model }}"
+     data-rating="{{ inventory.sword2.rating }}"
+     data-images="{{ inventory.sword2.image_paths if inventory.sword2.image_paths else '' }}"
+     data-weight="{{ inventory.sword2.weight }}"
+     data-length="{{ inventory.sword2.length }}"
+     data-balance-point="{{ inventory.sword2.balance_point }}"
+     data-point-perimeter="{{ inventory.sword2.point_perimeter }}"
+     data-stiffness="{{ inventory.sword2.stiffness }}">                 
                     {% if is_owner %}
                     <div class="item-controls">
                         <a href="{{ url_for('upload', item_type='sword2', weapon_class=current_weapon_class) }}" class="edit-btn" title="Редактировать">✏️</a>
@@ -572,15 +580,19 @@
             <div class="cell-label">Оружие 3</div>
             {% if inventory.sword3 %}
                 <div class="item-container">
-					<img src="{{ url_for('static', filename='uploads/' + inventory.sword3.image_paths.split(',')[0]) if inventory.sword3.image_paths else '' }}"
-                         alt="Оружие 3"
-                         data-description="{{ inventory.sword3.description }}"
-                         data-pros="{{ inventory.sword3.pros }}"
-                         data-cons="{{ inventory.sword3.cons }}"
-                         data-model="{{ inventory.sword3.model }}"
-                         data-rating="{{ inventory.sword3.rating }}"
-						 data-images="{{ inventory.sword3.image_paths if inventory.sword3.image_paths else '' }}">
-                    
+      <img src="{{ url_for('static', filename='uploads/' + inventory.sword3.image_paths.split(',')[0]) if inventory.sword3.image_paths else '' }}"				
+     alt="Оружие 3"
+     data-description="{{ inventory.sword3.description }}"
+     data-pros="{{ inventory.sword3.pros }}"
+     data-cons="{{ inventory.sword3.cons }}"
+     data-model="{{ inventory.sword3.model }}"
+     data-rating="{{ inventory.sword3.rating }}"
+     data-images="{{ inventory.sword3.image_paths if inventory.sword3.image_paths else '' }}"
+     data-weight="{{ inventory.sword3.weight }}"
+     data-length="{{ inventory.sword3.length }}"
+     data-balance-point="{{ inventory.sword3.balance_point }}"
+     data-point-perimeter="{{ inventory.sword3.point_perimeter }}"
+     data-stiffness="{{ inventory.sword3.stiffness }}">              
                     {% if is_owner %}
                     <div class="item-controls">
                         <a href="{{ url_for('upload', item_type='sword3', weapon_class=current_weapon_class) }}" class="edit-btn" title="Редактировать">✏️</a>
@@ -812,6 +824,27 @@ function fillPros(desc,Pros,cons,model,rating) {
     for (let i = 0; i < 5; i++) {
         stars += i < rating ? '★' : '☆';
     }
+    if (currentTooltipCell.classList.contains('sword1-cell') || 
+    currentTooltipCell.classList.contains('sword2-cell') || 
+    currentTooltipCell.classList.contains('sword3-cell')) {
+    
+    const weight = img.getAttribute('data-weight');
+    const length = img.getAttribute('data-length');
+    const balancePoint = img.getAttribute('data-balance-point');
+    const pointPerimeter = img.getAttribute('data-point-perimeter');
+    const stiffness = img.getAttribute('data-stiffness');
+    
+    detContainer.innerHTML += `
+        <section>
+            <h3><strong>Характеристики оружия</strong></h3>
+            <div>Вес: ${weight} г</div>
+            <div>Длина: ${length} см</div>
+            <div>Точка баланса: ${balancePoint} см от гарды</div>
+            <div>Периметр пунты: ${pointPerimeter} мм</div>
+            <div>Жесткость: ${stiffness}</div>
+        </section>
+    `;
+}
     starsContainer.innerHTML = `
       <section>
         <h3><strong>Рейтинг</strong></h3>

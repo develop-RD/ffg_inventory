@@ -55,6 +55,12 @@ class InventoryItem(db.Model):
     pros = db.Column(db.Text)
     cons = db.Column(db.Text)
     rating = db.Column(db.Integer)
+    # поля для оружия
+    weight = db.Column(db.Float)  # вес
+    length = db.Column(db.Float)  # длина
+    balance_point = db.Column(db.Float)  # точка баланса
+    point_perimeter = db.Column(db.Float)  # периметр пунты
+    stiffness = db.Column(db.String(20))  # жесткость
 
 
 @login_manager.user_loader
@@ -447,6 +453,12 @@ def upload(item_type):
                 model=request.form.get("model", ""),
                 model_site=request.form.get("model_site", ""),
                 rating=int(request.form.get("rating", 3)),
+                # Новые поля для оружия
+                weight=float(request.form.get("weight", 0)) if item_type in ['sword1', 'sword2', 'sword3'] else None,
+                length=float(request.form.get("length", 0)) if item_type in ['sword1', 'sword2', 'sword3'] else None,
+                balance_point=float(request.form.get("balance_point", 0)) if item_type in ['sword1', 'sword2', 'sword3'] else None,
+                point_perimeter=float(request.form.get("point_perimeter", 0)) if item_type in ['sword1', 'sword2', 'sword3'] else None,
+                stiffness=request.form.get("stiffness", "") if item_type in ['sword1', 'sword2', 'sword3'] else None            
             )
             print(item.model)
             db.session.add(item)
@@ -458,7 +470,13 @@ def upload(item_type):
             item.rating = int(request.form.get("rating", 3))
             item.model = request.form.get("model", "")
             item.model_site = request.form.get("model_site", "")
-
+            # Обновляем новые поля для оружия
+            if item_type in ['sword1', 'sword2', 'sword3']:
+                item.weight = float(request.form.get("weight", 0))
+                item.length = float(request.form.get("length", 0))
+                item.balance_point = float(request.form.get("balance_point", 0))
+                item.point_perimeter = float(request.form.get("point_perimeter", 0))
+                item.stiffness = request.form.get("stiffness", "")
             print("before", item.model)
         db.session.commit()
         return redirect(
@@ -470,7 +488,7 @@ def upload(item_type):
         )
 
     return render_template(
-        "upload.html", item_type=item_type, weapon_class=weapon_class, item=item
+        "upload.html", item_type=item_type, weapon_class=weapon_class, item=item, is_weapon=item_type in ['sword1', 'sword2', 'sword3']  # Передаем флаг, что это оружие
     )
 
 

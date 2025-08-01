@@ -86,7 +86,43 @@
                    value="{{ item.rating if item else 3 }}" 
                    min="1" max="5" required>
         </div>
-        
+        <!-- Характеристики меча -->
+        {% if is_weapon %}
+        <!-- Поля для оружия -->
+        <div class="form-group">
+        <label for="weight">Вес (г):</label>
+        <input type="number" id="weight" name="weight" step="0.01" 
+               value="{{ item.weight if item else '' }}">
+        </div>
+    
+        <div class="form-group">
+        <label for="length">Длина (см):</label>
+        <input type="number" id="length" name="length" step="0.1" 
+               value="{{ item.length if item else '' }}">
+        </div>
+    
+        <div class="form-group">
+        <label for="balance_point">Точка баланса (см от гарды):</label>
+        <input type="number" id="balance_point" name="balance_point" step="0.1" 
+               value="{{ item.balance_point if item else '' }}">
+        </div>
+    
+        <div class="form-group">
+        <label for="point_perimeter">Периметр пунты (мм):</label>
+        <input type="number" id="point_perimeter" name="point_perimeter" step="0.1" 
+               value="{{ item.point_perimeter if item else '' }}">
+        </div>
+    
+        <div class="form-group">
+        <label for="stiffness">Жесткость:</label>
+        <select id="stiffness" name="stiffness">
+            <option value="">-- Выберите жесткость --</option>
+            <option value="soft" {% if item and item.stiffness == 'soft' %}selected{% endif %}>Мягкая</option>
+            <option value="medium" {% if item and item.stiffness == 'medium' %}selected{% endif %}>Средняя</option>
+            <option value="hard" {% if item and item.stiffness == 'hard' %}selected{% endif %}>Жесткая</option>
+        </select>
+        </div>
+        {% endif %}
         <input type="hidden" name="weapon_class" value="{{ weapon_class }}">
         
         <div class="form-actions">
@@ -94,6 +130,7 @@
             <a href="{{ url_for('view_profile', username=current_user.username, weapon_class=weapon_class) }}" 
                class="btn cancel">Отмена</a>
         </div>
+
     </form>
 </div>
 
