@@ -306,13 +306,45 @@ function fillPros(desc, Pros, cons, model, rating) {
     for (let i = 0; i < 5; i++) {
         stars += i < ratingValue ? '★' : '☆';
     }
+   
+    console.log("search",currentTooltipCell)
+    if ((currentTooltipCell.firstElementChild.alt == 'Оружие 1') || 
+        (currentTooltipCell.firstElementChild.alt == 'Оружие 2') ||
+        (currentTooltipCell.firstElementChild.alt == 'Оружие 3'))
+    {
+        const imgElement = currentTooltipCell.firstElementChild;
+        console.log(imgElement.getAttribute('data-weight'))
+        const weight = imgElement.getAttribute('data-weight');
+        const length = imgElement.getAttribute('data-length');
+        const balancePoint = imgElement.getAttribute('data-balance-point');
+        const pointPerimeter = imgElement.getAttribute('data-point-perimeter');
+        const stiffness = imgElement.getAttribute('data-stiffness');
+        
+        detContainer.innerHTML += `
+            <section>
+                <h3><strong>Характеристики оружия</strong></h3>
+                <div>Вес: ${weight} г</div>
+                <div>Длина: ${length} см</div>
+                <div>Точка баланса: ${balancePoint} см от гарды</div>
+                <div>Периметр пунты: ${pointPerimeter} мм</div>
+                <div>Жесткость: ${stiffness}</div>
+            </section>
+        `;
+    }
     starsContainer.innerHTML = `
       <section>
         <h3><strong>Рейтинг</strong></h3>
         <div>${stars}</div>
       </section>
     `;
-    
+
+    starsContainer.innerHTML = `
+      <section>
+        <h3><strong>Рейтинг</strong></h3>
+        <div>${stars}</div>
+      </section>
+    `;
+
     for (const elem of prosList) {
         if (elem.trim()) {
             const li = document.createElement('li');

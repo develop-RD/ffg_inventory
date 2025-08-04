@@ -115,12 +115,8 @@
     
         <div class="form-group">
         <label for="stiffness">Жесткость:</label>
-        <select id="stiffness" name="stiffness">
-            <option value="">-- Выберите жесткость --</option>
-            <option value="soft" {% if item and item.stiffness == 'soft' %}selected{% endif %}>Мягкая</option>
-            <option value="medium" {% if item and item.stiffness == 'medium' %}selected{% endif %}>Средняя</option>
-            <option value="hard" {% if item and item.stiffness == 'hard' %}selected{% endif %}>Жесткая</option>
-        </select>
+        <input type="number" id="stiffness" name="stiffness" step="0.1" 
+               value="{{ item.stiffness if item else '' }}">
         </div>
         {% endif %}
         <input type="hidden" name="weapon_class" value="{{ weapon_class }}">

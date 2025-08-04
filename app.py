@@ -60,7 +60,7 @@ class InventoryItem(db.Model):
     length = db.Column(db.Float)  # длина
     balance_point = db.Column(db.Float)  # точка баланса
     point_perimeter = db.Column(db.Float)  # периметр пунты
-    stiffness = db.Column(db.String(20))  # жесткость
+    stiffness = db.Column(db.Float)  # жесткость
 
 
 @login_manager.user_loader
