@@ -102,7 +102,14 @@ def user_search_equip():
             query = query.filter_by(model=manufacturer)
         
         if item_type:
-            query = query.filter_by(item_type=item_type)
+            if item_type == "sword":
+                query = query.filter(
+                        (InventoryItem.item_type == "sword1") |
+                        (InventoryItem.item_type == "sword2") |
+                        (InventoryItem.item_type == "sword3") 
+                )
+            else:
+                query = query.filter_by(item_type=item_type)
         
         if rating_item:
             query = query.filter_by(rating=rating_item)
@@ -121,7 +128,6 @@ def user_search_equip():
                 if item.weapon_class not in items_by_class:
                     items_by_class[item.weapon_class] = []
                 items_by_class[item.weapon_class].append(item)
-            print(item) 
             results.append({
                 "user": user,
                 "items_by_class": items_by_class
@@ -131,7 +137,7 @@ def user_search_equip():
     item_types = [
         "gorget", "head", "namasnik", "naplech", "torso", 
         "ng", "brass", "lokti", "gloves", "sht", 
-        "pants", "shoes", "bag", "sword1", "sword2", "sword3"
+        "pants", "shoes", "bag", "sword"
     ]
     
     return render_template(
