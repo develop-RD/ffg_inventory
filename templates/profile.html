@@ -795,7 +795,6 @@ function fillPros(desc,Pros,cons,model,rating) {
     const consContainer = document.querySelector('.cons');
     const starsContainer = document.querySelector('.stars');
    
-    console.log("model=",model)
     //Преобразовываем model в кириллицу
     if (model == "PikeArmory"){
         model = "Pike Armory"
@@ -803,6 +802,24 @@ function fillPros(desc,Pros,cons,model,rating) {
         model = "Золотой Сокол"
     }else if (model == "Kvetun"){
         model = "Кветунь"
+    }else if (model == "PBT"){
+        model = "PBT"
+    }else if (model == "SPES"){
+        model = "SPES"
+    }else if (model == "Fencing_shop"){
+        model = "Fencing Shop"
+    }else if (model == "pangolins"){
+        model = "Панголины"
+    }else if (model == "foxtail"){
+        model = "Foxtail"
+    }else if (model == "Raidu"){
+        model = "Raidu"
+    }else if (model == "under_cover"){
+        model = "Under Cover"
+    }else if (model == "ultima_ratio"){
+        model = "Ultima Ratio"
+    }else if (model == "raven_blade"){
+        model = "Raven Blade"
     }else{
         model = " не указан "
     }

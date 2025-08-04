@@ -107,7 +107,6 @@ def user_search_equip():
         if rating_item:
             query = query.filter_by(rating=rating_item)
 
-        print(rating_item)
         if weapon_class != "all":
             query = query.filter(
                 (InventoryItem.weapon_class == weapon_class) |
@@ -122,7 +121,7 @@ def user_search_equip():
                 if item.weapon_class not in items_by_class:
                     items_by_class[item.weapon_class] = []
                 items_by_class[item.weapon_class].append(item)
-            
+            print(item) 
             results.append({
                 "user": user,
                 "items_by_class": items_by_class

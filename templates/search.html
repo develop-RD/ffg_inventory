@@ -113,14 +113,19 @@
                             {% endif%}
                         </div>
                         {% if item.image_paths %}
-                        <img src="{{ url_for('static', filename='uploads/' + item.image_paths.split(',')[0]) }}" 
+                        <img src="{{ url_for('static', filename='uploads/' + item.image_paths.split(',')[0]) }}"
                              alt="{{ item.item_type }}"
                              data-description="{{ item.description }}"
                              data-pros="{{ item.pros }}"
                              data-cons="{{ item.cons }}"
                              data-model="{{ item.model }}"
                              data-rating="{{ item.rating }}"
-                             data-images="{{ item.image_paths }}">
+                             data-images="{{ item.image_paths }}"
+                             data-weight="{{ item.weight }}"
+                             data-length="{{ item.length }}"
+                             data-balance-point="{{ item.balance_point }}"
+                             data-point-perimeter="{{ item.point_perimeter }}"
+                             data-stiffness="{{ item.stiffness }}">                  
                         {% else %}
                         <div class="no-image">Нет изображения</div>
                         {% endif %}
@@ -128,6 +133,15 @@
                             {% if item.model == "Kvetun" %}Кветунь
                             {% elif item.model == "Gold_Sokol" %}Золотой сокол
                             {% elif item.model == "PikeArmory" %}Pike Armory
+                            {% elif item.model == "PBT" %}PBT
+                            {% elif item.model == "SPES" %}SPES
+                            {% elif item.model == "Fencing_shop" %}Fencing shop
+                            {% elif item.model == "pangolins" %}Панголины
+                            {% elif item.model == "foxtail" %}Fox Tail
+                            {% elif item.model == "Raidu" %}Raidu
+                            {% elif item.model == "under_cover" %}Under Cover
+                            {% elif item.model == "ultima_ratio" %}Ultima Ratio
+                            {% elif item.model == "raven_blade" %}Raven Blade
                             {% else %}{{ item.model }}
                             {% endif %}
                         </div>
@@ -271,23 +285,33 @@ function fillPros(desc, Pros, cons, model, rating) {
     const consContainer = document.querySelector('.cons');
     const starsContainer = document.querySelector('.stars');
 
-    // Преобразовываем model в кириллицу
-    if (model == "PikeArmory") {
-        model = "Pike Armory";
-    } else if (model == "Gold_Sokol") {
-        model = "Золотой Сокол";
-    } else if (model == "Kvetun") {
-        model = "Кветунь";
-    } else if (model == "SPES") {
-        model = "SPES";
-    } else if (model == "pangolins") {
-        model = "Панголины";
-    } else if (model == "Fencing_shop") {
-        model = "Fencing shop";
-    } else if (model == "PBT") {
-        model = "PBT";
-    } else {
-        model = model || "не указан";
+ //Преобразовываем model в кириллицу
+    if (model == "PikeArmory"){
+        model = "Pike Armory"
+    }else if (model == "Gold_Sokol"){
+        model = "Золотой Сокол"
+    }else if (model == "Kvetun"){
+        model = "Кветунь"
+    }else if (model == "PBT"){
+        model = "PBT"
+    }else if (model == "SPES"){
+        model = "SPES"
+    }else if (model == "Fencing_shop"){
+        model = "Fencing Shop"
+    }else if (model == "pangolins"){
+        model = "Панголины"
+    }else if (model == "foxtail"){
+        model = "Foxtail"
+    }else if (model == "Raidu"){
+        model = "Raidu"
+    }else if (model == "under_cover"){
+        model = "Under Cover"
+    }else if (model == "ultima_ratio"){
+        model = "Ultima Ratio"
+    }else if (model == "raven_blade"){
+        model = "Raven Blade"
+    }else{
+        model = " не указан "
     }
 
     prosContainer.innerHTML = '<h3>Плюсы</h3>';
@@ -307,12 +331,12 @@ function fillPros(desc, Pros, cons, model, rating) {
         stars += i < ratingValue ? '★' : '☆';
     }
    
-    console.log("search",currentTooltipCell)
-    if ((currentTooltipCell.firstElementChild.alt == 'Оружие 1') || 
-        (currentTooltipCell.firstElementChild.alt == 'Оружие 2') ||
-        (currentTooltipCell.firstElementChild.alt == 'Оружие 3'))
+    console.log("search",currentTooltipCell.firstElementChild.nextElementSibling)
+    if ((currentTooltipCell.firstElementChild.outerText == 'Оружие 1') || 
+        (currentTooltipCell.firstElementChild.outerText == 'Оружие 2') ||
+        (currentTooltipCell.firstElementChild.outerText == 'Оружие 3'))
     {
-        const imgElement = currentTooltipCell.firstElementChild;
+        const imgElement = currentTooltipCell.firstElementChild.nextElementSibling;
         console.log(imgElement.getAttribute('data-weight'))
         const weight = imgElement.getAttribute('data-weight');
         const length = imgElement.getAttribute('data-length');
