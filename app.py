@@ -447,6 +447,28 @@ def upload(item_type):
                 image_paths.append(filename)
         # Создаем или обновляем запись
         if not item:
+            # проверка полей для меча
+            weight_val=request.form.get("weight")
+            length_val=request.form.get("length", "")
+            balance_point_val=request.form.get("balance_point", "")
+            point_perimeter_val=request.form.get("point_perimeter", "")
+            stiffness_val=request.form.get("stiffness", "")
+            if item_type in ['sword1', 'sword2', 'sword3']:
+                if (weight_val == ""):
+                    weight_val = 0;
+                
+                if (length_val == ""):
+                    length_val = 0;
+                
+                if (balance_point_val == ""):
+                    balance_point_val = 0;
+                
+                if (point_perimeter_val == ""):
+                    point_perimeter_val = 0;
+
+                if (stiffness_val == ""):
+                    stiffness_val = 0;
+
             item = InventoryItem(
                 user_id=current_user.id,
                 weapon_class=weapon_class,
@@ -459,13 +481,12 @@ def upload(item_type):
                 model_site=request.form.get("model_site", ""),
                 rating=int(request.form.get("rating", 3)),
                 # Новые поля для оружия
-                weight=float(request.form.get("weight", 0)) if item_type in ['sword1', 'sword2', 'sword3'] else None,
-                length=float(request.form.get("length", 0)) if item_type in ['sword1', 'sword2', 'sword3'] else None,
-                balance_point=float(request.form.get("balance_point", 0)) if item_type in ['sword1', 'sword2', 'sword3'] else None,
-                point_perimeter=float(request.form.get("point_perimeter", 0)) if item_type in ['sword1', 'sword2', 'sword3'] else None,
-                stiffness=request.form.get("stiffness", "") if item_type in ['sword1', 'sword2', 'sword3'] else None            
+                weight=float(weight_val) if item_type in ['sword1', 'sword2', 'sword3'] else None,  
+                length=float(length_val) if item_type in ['sword1', 'sword2', 'sword3'] else None, 
+                balance_point=float(balance_point_val) if item_type in ['sword1', 'sword2', 'sword3'] else None,          
+                point_perimeter=float(point_perimeter_val) if item_type in ['sword1', 'sword2', 'sword3'] else None,   
+                stiffness=stiffness_val
             )
-            print(item.model)
             db.session.add(item)
         else:
             item.image_paths = ",".join(image_paths) if image_paths else ""
