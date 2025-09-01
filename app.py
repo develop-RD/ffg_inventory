@@ -5,7 +5,10 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 import os
 import uuid
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
+import atexit
+from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.triggers.cron import CronTrigger
 # для указания стажа
 from dateutil.relativedelta import relativedelta
 
@@ -21,6 +24,13 @@ db = SQLAlchemy(app)
 login_manager = LoginManager(app)
 login_manager.login_view = "login"
 
+
+# Инициализация планировщика
+scheduler = BackgroundScheduler()
+scheduler.start()
+
+# Останавливаем планировщик при выходе из приложения
+atexit.register(lambda: scheduler.shutdown())
 
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
@@ -41,6 +51,7 @@ class User(db.Model, UserMixin):
     items = db.relationship(
         "InventoryItem", backref="user", lazy=True, cascade="all, delete-orphan"
     )
+    battle_responses = db.relationship("BattleResponse", backref="user", lazy=True)
 
 
 class InventoryItem(db.Model):
@@ -62,7 +73,15 @@ class InventoryItem(db.Model):
     point_perimeter = db.Column(db.Float)  # периметр пунты
     stiffness = db.Column(db.Float)  # жесткость
 
-
+class BattleResponse(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    battle_date = db.Column(db.Date, nullable=False)
+    status = db.Column(db.String(20), nullable=False)  # going, not_going, maybe
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    __table_args__ = (db.UniqueConstraint('user_id', 'battle_date', name='_user_battle_uc'),)
+    
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
@@ -74,6 +93,99 @@ def allowed_file(filename):
         and filename.rsplit(".", 1)[1].lower() in app.config["ALLOWED_EXTENSIONS"]
     )
 
+def get_next_sunday():
+    today = date.today()
+    days_until_sunday = (6 - today.weekday()) % 7
+    if days_until_sunday == 0:
+        days_until_sunday = 7
+    return today + timedelta(days=days_until_sunday)
+
+def get_last_sunday():
+    today = date.today()
+    days_since_sunday = today.weekday() + 1  # Monday=0, Sunday=6
+    if days_since_sunday == 7:
+        days_since_sunday = 0
+    return today - timedelta(days=days_since_sunday)
+
+def cleanup_old_battle_responses():
+    """Очистка старых ответов на бои каждый понедельник в 18:00"""
+    with app.app_context():
+        try:
+            # Удаляем все ответы за предыдущее воскресенье и более старые
+            last_sunday = get_last_sunday()
+            deleted_count = BattleResponse.query.filter(
+                BattleResponse.battle_date <= last_sunday
+            ).delete()
+            
+            db.session.commit()
+            print(f"[{datetime.now()}] Очищено {deleted_count} старых ответов на бои")
+            
+        except Exception as e:
+            db.session.rollback()
+            print(f"[{datetime.now()}] Ошибка при очистке ответов на бои: {e}")
+
+
+# Настраиваем задачу на каждый понедельник в 18:00
+scheduler.add_job(
+    func=cleanup_old_battle_responses,
+    trigger=CronTrigger(day_of_week='mon', hour=14, minute=54),
+    id='battle_cleanup_job',
+    name='Очистка старых ответов на бои каждый понедельник в 18:00',
+    replace_existing=True
+)
+
+print("Планировщик запущен: очистка ответов на бои каждый понедельник в 18:00")
+
+@app.route("/battles", methods=["GET", "POST"])
+@login_required
+def battles():
+    next_sunday = get_next_sunday()
+    filter_status = request.args.get("filter", "all")
+    
+    if request.method == "POST":
+        status = request.form.get("status")
+        if status in ["going", "not_going", "maybe"]:
+            # Проверяем, есть ли уже ответ для этой даты
+            existing_response = BattleResponse.query.filter_by(
+                user_id=current_user.id,
+                battle_date=next_sunday
+            ).first()
+            
+            if existing_response:
+                existing_response.status = status
+                existing_response.created_at = datetime.utcnow()
+            else:
+                new_response = BattleResponse(
+                    user_id=current_user.id,
+                    battle_date=next_sunday,
+                    status=status
+                )
+                db.session.add(new_response)
+            
+            db.session.commit()
+            flash("Ваш ответ сохранен!", "success")
+            return redirect(url_for("battles"))
+    
+    # Получаем все ответы на ближайшее воскресенье
+    responses = BattleResponse.query.filter_by(battle_date=next_sunday).all()
+    
+    # Применяем фильтр
+    if filter_status != "all":
+        responses = [r for r in responses if r.status == filter_status]
+    
+    # Получаем ответ текущего пользователя
+    user_response = BattleResponse.query.filter_by(
+        user_id=current_user.id,
+        battle_date=next_sunday
+    ).first()
+    
+    return render_template(
+        "battles.html",
+        next_sunday=next_sunday,
+        responses=responses,
+        user_response=user_response,
+        filter_status=filter_status
+    )
 
 @app.route("/users/search")
 @login_required
