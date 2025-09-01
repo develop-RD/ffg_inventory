@@ -341,7 +341,8 @@ function fillPros(desc, Pros, cons, model, rating) {
         const balancePoint = imgElement.getAttribute('data-balance-point');
         const pointPerimeter = imgElement.getAttribute('data-point-perimeter');
         const stiffness = imgElement.getAttribute('data-stiffness');
-        
+        if ((weight != 0) && (length !=0) && (balancePoint !=0 ) && (stiffness !=0))
+        {
         detContainer.innerHTML += `
             <section>
                 <h3><strong>Характеристики оружия</strong></h3>
@@ -352,6 +353,12 @@ function fillPros(desc, Pros, cons, model, rating) {
                 <div>Жесткость: ${stiffness}</div>
             </section>
         `;
+        }else
+        {
+            detContainer.innerHTML += ``;
+        }
+
+        
     }
     starsContainer.innerHTML = `
       <section>
