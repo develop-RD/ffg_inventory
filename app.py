@@ -81,7 +81,21 @@ class BattleResponse(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
     __table_args__ = (db.UniqueConstraint('user_id', 'battle_date', name='_user_battle_uc'),)
+
+class BattleChallenge(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    challenger_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)  # тот, кто бросает вызов
+    target_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)      # тот, кому бросают вызов
+    battle_date = db.Column(db.Date, nullable=False)                                 # дата боев
+    status = db.Column(db.String(20), default='pending')  # pending, accepted, declined
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
+    # Связи с пользователями
+    challenger = db.relationship('User', foreign_keys=[challenger_id], backref='challenges_sent')
+    target = db.relationship('User', foreign_keys=[target_id], backref='challenges_received')
+    
+    __table_args__ = (db.UniqueConstraint('challenger_id', 'target_id', 'battle_date', name='_challenge_uc'),)
+
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
@@ -135,6 +149,103 @@ scheduler.add_job(
 )
 
 print("Планировщик запущен: очистка ответов на бои каждый понедельник в 18:00")
+
+
+@app.route("/challenge/<username>", methods=["POST"])
+@login_required
+def challenge_user(username):
+    """Бросок вызова пользователю"""
+    target_user = User.query.filter_by(username=username).first_or_404()
+    next_sunday = get_next_sunday()
+    
+    # Проверяем, что пользователь не бросает вызов самому себе
+    if target_user.id == current_user.id:
+        flash("Нельзя бросить вызов самому себе", "error")
+        return redirect(url_for("battles"))
+    
+    # Проверяем, что целевой пользователь идет на бои
+    target_response = BattleResponse.query.filter_by(
+        user_id=target_user.id,
+        battle_date=next_sunday,
+        status='going'
+    ).first()
+    
+    if not target_response:
+        flash("Этот пользователь не идет на бои", "error")
+        return redirect(url_for("battles"))
+    
+    # Проверяем, что вызов еще не существует
+    existing_challenge = BattleChallenge.query.filter_by(
+        challenger_id=current_user.id,
+        target_id=target_user.id,
+        battle_date=next_sunday
+    ).first()
+    
+    if existing_challenge:
+        flash("Вы уже бросили вызов этому пользователю", "info")
+        return redirect(url_for("battles"))
+    
+    # Создаем новый вызов
+    new_challenge = BattleChallenge(
+        challenger_id=current_user.id,
+        target_id=target_user.id,
+        battle_date=next_sunday,
+        status='pending'
+    )
+    
+    db.session.add(new_challenge)
+    db.session.commit()
+    
+    flash(f"Вызов пользователю {username} успешно брошен!", "success")
+    return redirect(url_for("battles"))
+
+@app.route("/challenge/accept/<int:challenge_id>", methods=["POST"])
+@login_required
+def accept_challenge(challenge_id):
+    """Принятие вызова"""
+    challenge = BattleChallenge.query.get_or_404(challenge_id)
+    
+    # Проверяем, что текущий пользователь - цель вызова
+    if challenge.target_id != current_user.id:
+        abort(403)
+    
+    challenge.status = 'accepted'
+    db.session.commit()
+    
+    flash("Вызов принят! Удачи в бою!", "success")
+    return redirect(url_for("battles"))
+
+@app.route("/challenge/decline/<int:challenge_id>", methods=["POST"])
+@login_required
+def decline_challenge(challenge_id):
+    """Отклонение вызова"""
+    challenge = BattleChallenge.query.get_or_404(challenge_id)
+    
+    # Проверяем, что текущий пользователь - цель вызова
+    if challenge.target_id != current_user.id:
+        abort(403)
+    
+    challenge.status = 'declined'
+    db.session.commit()
+    
+    flash("Вызов отклонен", "info")
+    return redirect(url_for("battles"))
+
+@app.route("/challenge/cancel/<int:challenge_id>", methods=["POST"])
+@login_required
+def cancel_challenge(challenge_id):
+    """Отмена своего вызова"""
+    challenge = BattleChallenge.query.get_or_404(challenge_id)
+    
+    # Проверяем, что текущий пользователь - автор вызова
+    if challenge.challenger_id != current_user.id:
+        abort(403)
+    
+    db.session.delete(challenge)
+    db.session.commit()
+    
+    flash("Вызов отменен", "info")
+    return redirect(url_for("battles"))
 
 @app.route("/battles", methods=["GET", "POST"])
 @login_required

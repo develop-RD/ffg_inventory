@@ -12,6 +12,71 @@
         <h2>Ближайшее воскресенье: {{ next_sunday.strftime('%d.%m.%Y') }}</h2>
     </div>
     
+    <!-- Блок вызовов -->
+    <div class="challenges-section">
+        <h3>Мои вызовы</h3>
+        
+        <!-- Полученные вызовы -->
+        {% set received_challenges = current_user.challenges_received|selectattr('battle_date', 'equalto', next_sunday) %}
+        {% if received_challenges %}
+        <div class="challenges-received">
+            <h4>Вам бросили вызов:</h4>
+            {% for challenge in received_challenges %}
+            <div class="challenge-item">
+                <span class="challenger">
+                    <a href="{{ url_for('view_profile', username=challenge.challenger.username) }}">
+                        {{ challenge.challenger.username }}
+                    </a>
+                </span>
+                <span class="challenge-status {{ challenge.status }}">
+                    {% if challenge.status == 'pending' %}
+                    <form method="POST" action="{{ url_for('accept_challenge', challenge_id=challenge.id) }}" style="display: inline;">
+                        <button type="submit" class="btn-accept">Принять</button>
+                    </form>
+                    <form method="POST" action="{{ url_for('decline_challenge', challenge_id=challenge.id) }}" style="display: inline;">
+                        <button type="submit" class="btn-decline">Отклонить</button>
+                    </form>
+                    {% elif challenge.status == 'accepted' %}
+                    <span class="status-accepted">Принят</span>
+                    {% else %}
+                    <span class="status-declined">Отклонен</span>
+                    {% endif %}
+                </span>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        
+        <!-- Отправленные вызовы -->
+        {% set sent_challenges = current_user.challenges_sent|selectattr('battle_date', 'equalto', next_sunday) %}
+        {% if sent_challenges %}
+        <div class="challenges-sent">
+            <h4>Ваши вызовы:</h4>
+            {% for challenge in sent_challenges %}
+            <div class="challenge-item">
+                <span class="target">
+                    <a href="{{ url_for('view_profile', username=challenge.target.username) }}">
+                        {{ challenge.target.username }}
+                    </a>
+                </span>
+                <span class="challenge-status {{ challenge.status }}">
+                    {% if challenge.status == 'pending' %}
+                    <span class="status-pending">Ожидание</span>
+                    <form method="POST" action="{{ url_for('cancel_challenge', challenge_id=challenge.id) }}" style="display: inline;">
+                        <button type="submit" class="btn-cancel">Отменить</button>
+                    </form>
+                    {% elif challenge.status == 'accepted' %}
+                    <span class="status-accepted">Принят</span>
+                    {% else %}
+                    <span class="status-declined">Отклонен</span>
+                    {% endif %}
+                </span>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+    
     <div class="response-form">
         <h3>Ваше участие:</h3>
         <form method="POST">
@@ -83,6 +148,14 @@
                    class="username-link" title="Перейти к профилю">
                     <span class="username">{{ response.user.username }}</span>
                 </a>
+                
+                <!-- Кнопка броска вызова -->
+                {% if response.user.id != current_user.id and response.status == 'going' %}
+                <form method="POST" action="{{ url_for('challenge_user', username=response.user.username) }}" style="display: inline;">
+                    <button type="submit" class="btn-challenge" title="Бросить вызов">⚔️</button>
+                </form>
+                {% endif %}
+                
                 <span class="status-badge {{ response.status }}">
                     {% if response.status == 'going' %}Иду
                     {% elif response.status == 'not_going' %}Не иду
@@ -99,6 +172,143 @@
 </div>
 
 <style>
+/* Стили для навигации с бейджами */
+.nav-link-with-badge {
+    position: relative;
+    display: inline-block;
+}
+
+.nav-badge {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background-color: #f44336;
+    color: white;
+    border-radius: 50%;
+    padding: 2px 6px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+/* Стили для раздела вызовов */
+.challenges-section {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.challenges-section h3 {
+    margin-top: 0;
+    color: #333;
+    border-bottom: 2px solid #2196F3;
+    padding-bottom: 10px;
+}
+
+.challenges-received, .challenges-sent {
+    margin-bottom: 15px;
+}
+
+.challenges-received h4, .challenges-sent h4 {
+    color: #555;
+    margin-bottom: 10px;
+}
+
+.challenge-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    border: 1px solid #eee;
+    border-radius: 6px;
+    margin-bottom: 8px;
+    background-color: #f9f9f9;
+}
+
+.challenger a, .target a {
+    font-weight: bold;
+    text-decoration: none;
+    color: #2196F3;
+}
+
+.challenger a:hover, .target a:hover {
+    text-decoration: underline;
+}
+
+.challenge-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Стили для кнопок вызовов */
+.btn-challenge {
+    background: none;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+.btn-challenge:hover {
+    background-color: #ffeb3b;
+    transform: scale(1.1);
+}
+
+.btn-accept, .btn-decline, .btn-cancel {
+    padding: 4px 8px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.btn-accept {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.btn-accept:hover {
+    background-color: #3e8e41;
+}
+
+.btn-decline {
+    background-color: #f44336;
+    color: white;
+}
+
+.btn-decline:hover {
+    background-color: #d32f2f;
+}
+
+.btn-cancel {
+    background-color: #ff9800;
+    color: white;
+}
+
+.btn-cancel:hover {
+    background-color: #f57c00;
+}
+
+.status-pending {
+    color: #ff9800;
+    font-weight: bold;
+}
+
+.status-accepted {
+    color: #4CAF50;
+    font-weight: bold;
+}
+
+.status-declined {
+    color: #f44336;
+    font-weight: bold;
+}
+
+/* Остальные стили остаются без изменений */
 .battles-container {
     max-width: 800px;
     margin: 0 auto;
